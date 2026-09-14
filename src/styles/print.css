@@ -1,0 +1,20 @@
+@media print {
+  @page { margin: 16mm; }
+  html body { background: white; color: black; font-size: 11pt; }
+  .site-header, .site-footer, .skip-link, .recipe-actions, .back-link, .recipe-end,
+  .filters, #results-status, #search-error, #no-results { display: none !important; }
+  body .wrapper { width: 100%; max-width: none; padding: 0; }
+  body h1 { font-size: 24pt !important; }
+  body h2 { font-size: 18pt; break-after: avoid; }
+  body h3 { font-size: 14pt; break-after: avoid; }
+  body .recipe-body { margin-top: 1rem; font-size: 11pt; }
+  body .recipe-facts { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  body a { color: black; text-decoration: none; }
+  body .ingredient input { display: none; }
+  body .recipe-body li.ingredient { display: block; break-inside: avoid; }
+  body .ingredient label { padding: .15rem 0; min-height: 0; font-size: 11pt; }
+  body .ingredient input:checked + label { text-decoration: none; color: black; }
+  body .recipe-body li { margin-bottom: .4rem; }
+  body th, body td { background: white; color: black; }
+  body tr, body .recipe-facts, body .source-credit { break-inside: avoid; }
+}

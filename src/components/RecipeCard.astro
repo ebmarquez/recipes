@@ -1,0 +1,23 @@
+---
+import type { Recipe } from '../lib/recipe-contract.ts';
+import { recipeHref } from '../lib/publication.ts';
+interface Props { recipe: Recipe }
+const { recipe } = Astro.props;
+---
+<li class="recipe-card" data-recipe-card data-filter={JSON.stringify({
+  category: recipe.category,
+  cuisine: recipe.cuisine,
+  main_ingredients: recipe.main_ingredients,
+  total_minutes: recipe.total_minutes,
+})} data-url={recipeHref(recipe.slug, import.meta.env.BASE_URL)}>
+  <article>
+    <p class="eyebrow">{recipe.category} <span aria-hidden="true">&middot;</span> {recipe.cuisine}</p>
+    <h3><a href={recipeHref(recipe.slug, import.meta.env.BASE_URL)}>{recipe.title}</a></h3>
+    <p class="card-description">{recipe.description}</p>
+    <p class="card-ingredients">{recipe.main_ingredients.join(' / ')}</p>
+    <div class="card-bottom">
+      <span>{recipe.total_minutes === null ? `${recipe.total_time} · timing varies` : `${recipe.total_minutes} min total`}</span>
+      <span>{recipe.difficulty}</span>
+    </div>
+  </article>
+</li>

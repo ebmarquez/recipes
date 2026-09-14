@@ -1,0 +1,53 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { publishedRecipes, recipeHref } from '../lib/publication.ts';
+export async function getStaticPaths() {
+  return publishedRecipes(await getCollection('recipes')).map(recipe => ({
+    params: { slug: recipe.data.slug }, props: { recipe },
+  }));
+}
+interface Props { recipe: CollectionEntry<'recipes'> }
+const { recipe } = Astro.props;
+const { data } = recipe;
+const { Content } = await render(recipe);
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<SiteLayout title={data.title} description={data.description}>
+  <article class="recipe wrapper" data-pagefind-body data-recipe-page>
+    <a class="back-link" href={`${home}#browse`} data-pagefind-ignore>&larr; All recipes</a>
+    <header class="recipe-header">
+      <p class="eyebrow">{data.cuisine} <span aria-hidden="true">&middot;</span> {data.category}</p>
+      <h1 data-pagefind-meta="title">{data.title}</h1>
+      <p class="recipe-description" data-pagefind-meta="description">{data.description}</p>
+      <div class="recipe-actions" data-pagefind-ignore>
+        <a class="button" href="#ingredients">Jump to ingredients</a>
+        <a class="button button-outline" href="#directions">Jump to directions</a>
+        <button id="print-recipe" class="text-button" type="button" hidden>Print recipe</button>
+      </div>
+      <dl class="recipe-facts">
+        <div><dt>Prep</dt><dd>{data.prep_time}</dd></div>
+        <div><dt>Cook</dt><dd>{data.cook_time}</dd></div>
+        <div><dt>Total</dt><dd>{data.total_time}</dd></div>
+        <div><dt>Yield</dt><dd>{data.yield}</dd></div>
+        <div><dt>Difficulty</dt><dd>{data.difficulty}</dd></div>
+      </dl>
+      {data.total_minutes === null && <p class="field-help">Total timing varies; this recipe is not included in time-limited filters.</p>}
+      <p class="source-credit">Source: {data.source_url ? <a href={data.source_url}>{data.source_name}</a> : data.source_name}</p>
+    </header>
+    <div class="recipe-body"><Content /></div>
+    <footer class="recipe-end" data-pagefind-ignore>
+      <p>Keep cooking, keep it simple.</p>
+      <a href={`${home}#browse`}>Back to the recipe box &rarr;</a>
+      <p class="permalink">Recipe path: {recipeHref(data.slug, import.meta.env.BASE_URL)}</p>
+    </footer>
+  </article>
+  <script>
+    const button = document.querySelector<HTMLButtonElement>('#print-recipe');
+    if (button) {
+      button.hidden = false;
+      button.addEventListener('click', () => window.print());
+    }
+  </script>
+</SiteLayout>

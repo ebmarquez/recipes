@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import RecipeCard from '../components/RecipeCard.astro';
+import { recentRecipes } from '../lib/publication.ts';
+const recipes = recentRecipes(await getCollection('recipes'));
+const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
+  [...new Set(recipes.flatMap(recipe => recipe.data[key]))].sort((a, b) => a.localeCompare(b));
+---
+<SiteLayout>
+  <section class="hero wrapper">
+    <p class="eyebrow">A little inspiration for your everyday</p>
+    <h1>The Everyday Table</h1>
+    <p class="subtitle">Practical recipes for home cooks</p>
+    <p class="hero-note">Familiar ingredients. Clear directions. Something good to share.</p>
+    <a class="button" href="#browse">Find your next meal <span aria-hidden="true">&darr;</span></a>
+  </section>
+  <section id="browse" class="browse wrapper" aria-labelledby="browse-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">From the recipe box</p><h2 id="browse-heading">Recently added</h2></div>
+      <p>Simple ideas, ready for your kitchen.</p>
+    </div>
+    <form id="recipe-filters" class="filters" role="search" aria-label="Find a recipe" hidden>
+      <div class="search-field">
+        <label for="recipe-search">Search recipes &amp; ingredients</label>
+        <input id="recipe-search" name="q" type="search" placeholder="Try cilantro, corn, or a recipe name" autocomplete="off" aria-describedby="search-help" />
+        <p id="search-help" class="field-help">Search the full recipe, including its ingredients.</p>
+      </div>
+      <div class="filter-grid">
+        <div><label for="cuisine">Cuisine</label><select id="cuisine" name="cuisine"><option value="">All cuisines</option>{choices('cuisine').map(value => <option>{value}</option>)}</select></div>
+        <div><label for="category">Category</label><select id="category" name="category"><option value="">All categories</option>{choices('category').map(value => <option>{value}</option>)}</select></div>
+        <div><label for="ingredient">Main ingredient</label><select id="ingredient" name="ingredient"><option value="">Any ingredient</option>{choices('main_ingredients').map(value => <option>{value}</option>)}</select></div>
+        <div><label for="time">Known total time</label><select id="time" name="time"><option value="">Any duration</option><option value="15">15 minutes or less</option><option value="30">30 minutes or less</option><option value="60">60 minutes or less</option></select></div>
+      </div>
+      <div class="filter-footer"><p>Time limits include only recipes with a known total.</p><button type="reset" class="text-button">Clear filters</button></div>
+    </form>
+    <p id="browse-help" class="notice">All recipes are listed below. Search and filters need JavaScript; reading, ingredient checkboxes, and printing do not.</p>
+    <p id="results-status" role="status" aria-live="polite">{recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'}</p>
+    <p id="search-error" class="notice" role="alert" hidden></p>
+    <ul class="recipe-grid" id="recipe-list">{recipes.map(({ data }) => <RecipeCard recipe={data} />)}</ul>
+    <p id="no-results" class="notice" hidden>No recipes match. Try another ingredient or clear your filters.</p>
+    {recipes.length === 0 && <p class="notice">The recipe box is waiting for its first approved recipe.</p>}
+  </section>
+  <script>
+    import '../scripts/browse.ts';
+  </script>
+</SiteLayout>

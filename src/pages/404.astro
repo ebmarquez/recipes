@@ -1,0 +1,12 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<SiteLayout title="Recipe not found">
+  <section class="wrapper hero">
+    <p class="eyebrow">An empty place at the table</p>
+    <h1>Recipe not found</h1>
+    <p>This address is not in our recipe box.</p>
+    <a class="button" href={home}>Browse recipes</a>
+  </section>
+</SiteLayout>
