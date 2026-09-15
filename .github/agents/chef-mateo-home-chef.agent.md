@@ -51,8 +51,12 @@ New entries start as `publication_status: draft`. A draft in a public Git
 repository is still publicly readable: keep genuinely private or rights-unclear
 material outside this repository, its branches, and its pull requests.
 
-Keep externally credited recipes and guides as link-only source-library cards
-in `content\sources.json`; do not reproduce their methods or nutrition here.
+Keep original-source links in `content\sources.json`. A full recipe may be an
+independently written adaptation of factual ingredients and cooking procedures,
+with accurate `source_name` and a public `source_url` when known. Do not copy
+protected prose, distinctive wording, quotations, or photographs. Do not imply
+source-author endorsement or physical testing. Hold unresolved quantities or
+unsafe preservation processes instead of inventing replacements.
 The owner-approved initial release does not authorize publishing future
 additions without review or grant a blanket content/code reuse license.
 

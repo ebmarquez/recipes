@@ -33,7 +33,10 @@ and set actual creation/modification dates before saving a real recipe.
 Add source information only when known, never assume missing attribution
 means original content.
 This repository is public, even for drafts. Do not include private schedules
-or personal notes. External works belong in the link-only source library.
+or personal notes. For an independently written adaptation, record the known
+creator in `source_name` and a genuine public `source_url` when available.
+Explain material adaptations. Do not copy protected wording or photos, invent
+a missing source link, or imply the recipe has been physically tested.
 
 ## Ingredients
 

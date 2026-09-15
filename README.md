@@ -12,15 +12,19 @@ every recipe has been tested.
 
 This repository is public. The owner approved public hosting and the release of
 editorially reviewed recipes whose rights they confirmed, including uncredited
-recipes. Externally credited material is represented by **link-only references**
-in the source library, not copied recipe instructions.
+recipes. Full recipe pages may also contain independently written adaptations
+based on factual ingredient quantities and cooking procedures, with honest
+source credit and a public source link when known. Protected article prose,
+distinctive recipe wording, quotations, and photos are not copied.
+The source library links to original creators and to hosted adaptations when
+available; an attribution is not a claim of testing or endorsement.
 
 `publication_status: published` includes an owner-approved entry in the public
 build. New recipes and source references still start as `draft`; future
 publication needs owner review. A successful Pages deployment, not a metadata
 change or this README, confirms that a release is live.
-The September 14, 2026 release date is the approved intended launch date; the
-owner confirms it against the successful deployment.
+Published recipes record their release date, confirmed against the successful
+deployment.
 
 Draft status only controls generated output. Source files, branches, PRs, and
 history in this public repository remain public. Keep private notes, schedules,
