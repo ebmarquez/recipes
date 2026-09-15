@@ -81,10 +81,18 @@ Missing source metadata does not prove originality.
 
 The repository is public. The initial release includes uncredited recipes
 after the owner's rights confirmation and editorial review; this is not
-automatic permission for future additions. Externally credited material is
-link-only in `content\sources.json`, not a copied hosted recipe. Follow that
-file's strict schema in `docs\authoring.md` and start new references as drafts.
-Keep external references out of hosted recipe counts and search.
+automatic permission for future additions. Independently written adaptations
+of factual ingredient quantities and procedures can be full recipe entries,
+with honest creator/source credit and a public source link when known.
+Do not copy protected prose, distinctive wording, quotations, or images, or
+closely paraphrase an article. State material adaptations without claiming
+source endorsement or physical testing. Hold unresolved quantities and unsafe
+preservation processes rather than inventing values.
+
+Keep original-source link cards in `content\sources.json`, following its strict
+schema in `docs\authoring.md`. New references start as drafts. A matching
+published recipe slug links a card to the full adaptation; source cards alone
+stay out of hosted recipe counts and search.
 No additional reuse license is granted, third-party rights are retained,
 and no exclusive copyright over AI-only output is asserted.
 

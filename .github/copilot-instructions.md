@@ -16,8 +16,11 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
 - This repository is public. The owner approved hosting and the reviewed
   release set, including uncredited recipes whose rights they confirmed.
   Future recipe/source publication still requires owner approval.
-- Externally credited works are link-only cards in `content\sources.json`.
-  Do not copy their instructions, images, or nutrition into hosted recipes.
+- Keep original-source links in `content\sources.json`. Full recipes can be
+  independently written adaptations of factual ingredient quantities and
+  procedures, with truthful source credit and a public link when known.
+  Do not copy protected prose, quotations, images, or distinctive wording.
+  Do not invent source URLs, testing claims, quantities, or nutrition values.
 - Publishing approval grants no additional reuse license. Third-party rights
   remain with their owners; do not claim exclusive rights over AI-only output.
 

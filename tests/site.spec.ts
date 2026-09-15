@@ -111,7 +111,7 @@ test('draft recipes and source references never expose routes, links or searchab
   expect(await page.content()).not.toContain('test-build-hidden-source');
 });
 
-test('source library contains only labeled external cards, never copied recipe methods', async ({ page }) => {
+test('source library credits originals and links to published adaptations without copying methods', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('navigation').getByRole('link', { name: 'Source library' }).click();
   await expect(page).toHaveURL(/\/recipes\/sources\/$/);
@@ -122,7 +122,13 @@ test('source library contains only labeled external cards, never copied recipe m
   await expect(sourceCards).toHaveCount(sources.length);
   for (const [index, source] of sources.entries()) {
     const card = sourceCards.nth(index);
-    await expect(card.getByRole('link')).toHaveAttribute('href', source.source_url);
+    await expect(card.locator('h2 a')).toHaveAttribute('href', source.source_url);
+    const adaptation = card.getByRole('link', { name: 'Read this adaptation', exact: true });
+    if (recipes.some(recipe => recipe.data.slug === source.slug)) {
+      await expect(adaptation).toHaveAttribute('href', `${SITE_BASE}${source.slug}/`);
+    } else {
+      await expect(adaptation).toHaveCount(0);
+    }
     await expect(card).toContainText(`Source: ${source.source_name}`);
     await expect(card).toContainText(source.description);
     await expect(card).toContainText('External reference');

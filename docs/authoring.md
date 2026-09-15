@@ -9,7 +9,15 @@ Attribution is not permission; an absent source does not establish ownership.
 The owner approved public hosting and the editorially reviewed release set,
 including uncredited recipes whose rights they confirmed. This approval does
 not automatically cover future additions or authorize copying external works.
-Externally credited material belongs in the link-only source library.
+Full recipe details may be an independently written adaptation of factual
+ingredient quantities and cooking procedures, with accurate source attribution.
+Do not copy protected prose, distinctive wording, photographs, or quotations,
+or closely paraphrase an article. Keep private source URLs out of the site.
+Use `source_name` for the known creator or saved attribution and `source_url`
+for a genuine public link when available; leave unknown links null.
+Label material changes and adaptations without implying source-author
+endorsement or physical testing. Hold unresolved quantities and unsafe
+preservation processes rather than inventing values.
 No additional reuse license is granted, third-party rights remain with their
 owners, and no exclusive rights over AI-only output are asserted.
 
@@ -129,7 +137,10 @@ private material out of source files, branches, PRs, and Git history.
 
 ## External source library
 
-Keep externally credited works as link-only references in `content\sources.json`.
+Keep links to original works in `content\sources.json`; these cards themselves
+do not contain copied recipe bodies. A separately reviewed, independently
+written adaptation belongs in `content\recipes`. If its slug matches a source
+card, the library also offers a link to the full adaptation.
 Each entry has exactly these fields:
 
 | Field | Contract |
@@ -147,11 +158,12 @@ recipe metadata to source cards. The source library identifies every entry as
 an external reference and directs readers to the creator's recipe or guide.
 It is separate from hosted recipe counts, filters, and Pagefind search.
 Draft source entries are excluded before rendering or serialization.
-There are no individual local pages for external source entries.
+A source entry alone does not generate an individual recipe page. A matching
+published recipe generates its own page and retains its source credit.
 
 Recipe Markdown may link directly to a reviewed public external source URL.
 Unknown or unmigrated recipe targets remain plain text; do not create a broken
-local link or copy an external method to fill the gap.
+local link or copy protected wording to fill the gap.
 
 ## Owner-approved release
 

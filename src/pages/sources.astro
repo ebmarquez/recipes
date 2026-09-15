@@ -1,14 +1,17 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { getCollection } from 'astro:content';
+import { publishedRecipes, recipeHref } from '../lib/publication.ts';
 import { readSources, publishedSources } from '../lib/sources.ts';
 const sources = publishedSources(await readSources());
+const hostedSlugs = new Set(publishedRecipes(await getCollection('recipes')).map(recipe => recipe.data.slug));
 ---
 <SiteLayout title="Source library" description="Links to recipes and cooking guides from their original creators. Visit each source for the complete recipe or article.">
   <section class="wrapper source-library" data-pagefind-ignore aria-labelledby="sources-heading">
     <p class="eyebrow">From other kitchens</p>
     <h1 id="sources-heading">Source library</h1>
     <p class="subtitle">Good ideas, credited to their creators.</p>
-    <p class="notice">These are external references, not recipes hosted here. Follow the link to the original recipe or guide for ingredients and instructions. Publishers control availability and may require sign-in or a subscription.</p>
+    <p class="notice">These are external references to the original recipes and guides. Where available, you can also read an independently written adaptation in this collection. Publishers control availability and may require sign-in or a subscription.</p>
     <p class="source-count">{sources.length} {sources.length === 1 ? 'reference' : 'references'}</p>
     <ul class="recipe-grid source-grid">
       {sources.map(source => <li class="recipe-card source-card" data-source-card>
@@ -17,6 +20,7 @@ const sources = publishedSources(await readSources());
           <h2><a href={source.source_url} rel="external">{source.title}<span class="visually-hidden"> — at {source.source_name} (external site)</span></a></h2>
           <p>{source.description}</p>
           <p class="source-credit">Source: {source.source_name}</p>
+          {hostedSlugs.has(source.slug) && <p><a href={recipeHref(source.slug, import.meta.env.BASE_URL)}>Read this adaptation</a></p>}
           <div class="card-bottom"><span>{source.cuisine}</span><span>Read at the original source &nearr;</span></div>
         </article>
       </li>)}
