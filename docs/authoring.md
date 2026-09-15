@@ -2,11 +2,16 @@
 
 ## Review before adding content
 
-Only approved, public-safe content belongs in this fresh private pilot repository.
+Only approved, public-safe content belongs in this public cookbook repository.
 Do not copy private notes or repository history here. Review source provenance,
 rights, personal information, food safety, and recipe accuracy with the owner.
 Attribution is not permission; an absent source does not establish ownership.
-Source review and licensing/visibility approval remain mandatory before phase 4.
+The owner approved public hosting and the editorially reviewed release set,
+including uncredited recipes whose rights they confirmed. This approval does
+not automatically cover future additions or authorize copying external works.
+Externally credited material belongs in the link-only source library.
+No additional reuse license is granted, third-party rights remain with their
+owners, and no exclusive rights over AI-only output are asserted.
 
 ## Metadata contract
 
@@ -31,13 +36,13 @@ The single schema in `src\lib\recipe-contract.ts` is used by Astro and Node test
 | `key_technique` | Nonempty text |
 | `special_notes` | String; may be empty |
 | `date_created`, `date_modified` | Valid `YYYY-MM-DD` calendar dates |
-| `date_published` | Optional or `null`; only a genuine publication date |
+| `date_published` | Optional/null while drafting; owner-approved release date required for deployment |
 | `source_name` | Required for `published`; optional for `draft` until known; never invent provenance |
 | `source_url` | Optional or `null`; absolute HTTP(S) URL without credentials |
 
 Unknown keys, duplicate YAML keys, invalid values, duplicate/colliding slugs, and
 inconsistent filenames fail validation. Reserved slugs include `index`, `404`,
-`recipes`, `search`, `pagefind`, `sitemap`, `robots`, `assets`, and `favicon`.
+`recipes`, `search`, `sources`, `pagefind`, `sitemap`, `robots`, `assets`, and `favicon`.
 Dates stay date-only strings; they are not converted into fabricated publication
 timestamps.
 
@@ -58,13 +63,15 @@ Use level-two sections. Include:
 Ingredients are the sole source of truth. The renderer adds large labeled
 checkboxes only within the Ingredients section. Markdown task markers in shopping
 or other lists render as ordinary bullets, not additional checkbox controls.
+Pagefind skips native label text, so the renderer derives an indexing attribute
+from the same Markdown ingredient. Do not maintain a second authored ingredient list.
 Checking ingredients is temporary browser state, not a saved shopping list.
 Numbered directions and source-supported nutrition estimate tables render normally.
 Nutrition values must remain clearly labeled estimates. Do not add unsupported
 values, ratings, fictitious credentials, or duplicate ingredient data for JSON-LD.
-The pilot intentionally emits no recipe JSON-LD.
+The site intentionally emits no recipe JSON-LD.
 
-Raw HTML, wikilinks, and images are rejected by this pilot contract. A future image
+Raw HTML, wikilinks, and images are rejected by the current contract. A future image
 feature needs reviewed licensing, local assets, alt text, and credit support.
 
 ## Links and stable URLs
@@ -91,7 +98,7 @@ A typo pointing to an unknown recipe fails the build with a file/link error.
 A link to an existing `draft` becomes plain display text, without its draft URL.
 An unmigrated recipe should be ordinary text, not a pretend link.
 
-## Drafts and local inclusion
+## Drafts and public inclusion
 
 Start from `.github\skills\home-athlete-cooking\templates\recipe-template.md`.
 Copy it to a new filename and set a matching new `slug`. It defaults to `draft`
@@ -99,29 +106,72 @@ and deliberately omits `source_name`; an unknown source must not be filled with
 an assumption of originality. This is a valid draft, but changing it to
 `published` without a known source credit fails validation.
 Replace all placeholders and the example creation/modification dates before
-saving a real recipe for review. Keep `date_published: null` until actual publication.
+saving a real recipe for review. Keep `date_published: null` while drafting.
+For an approved release, the owner sets the intended release date and confirms
+it after successful deployment. The September 14, 2026 launch uses `2026-09-14`.
 
 A new valid draft requires no site-code change. Drafts are validated but excluded
 before Astro stores content. They are not in routes, home-page data, filter choices,
-search, or downloadable static payloads. No sitemap or feed is emitted in this
-private, `noindex` pilot.
+search, the sitemap, or downloadable static payloads. The public sitemap
+contains the home page, source library, and published recipe pages only.
+No feed is emitted.
 Contract tests read the actual parent-owned template; the browser build uses a
 template-derived draft to verify that it remains outside generated output.
 
-`published` means included in a generated **private local build**. It does not
-authorize public source visibility, a deployment, or phase 4. Leave
-`date_published` absent or null until genuine publication. "Recently added" uses
-modified/created dates when no publication date exists.
+`published` means included in the generated **public site**. Move an entry to
+this status only after owner review of its provenance, privacy, and content.
+Deployment verification requires a release date for every published recipe.
+The schema still accepts null dates while preparing content; a release with
+missing dates cannot pass the deployment gate.
 
 Draft status is never a privacy mechanism for a public Git repository. Keep truly
 private material out of source files, branches, PRs, and Git history.
+
+## External source library
+
+Keep externally credited works as link-only references in `content\sources.json`.
+Each entry has exactly these fields:
+
+| Field | Contract |
+| --- | --- |
+| `slug` | Unique lowercase ASCII identifier with hyphen-separated words |
+| `title`, `description` | Nonempty plain text; concise original descriptions, not copied instructions |
+| `source_name` | Honest creator/publication attribution; do not invent an unknown creator |
+| `source_url` | Safe absolute public HTTP(S) URL; no credentials or private/share links |
+| `cuisine`, `category` | Nonempty plain text using consistent vocabulary |
+| `publication_status` | `draft` by default; `published` only after owner approval |
+
+Unknown fields, duplicate slugs, unsafe URLs, and HTML in text fail validation.
+Do not add recipe bodies, ingredients, nutrition, ratings, or local cookable
+recipe metadata to source cards. The source library identifies every entry as
+an external reference and directs readers to the creator's recipe or guide.
+It is separate from hosted recipe counts, filters, and Pagefind search.
+Draft source entries are excluded before rendering or serialization.
+There are no individual local pages for external source entries.
+
+Recipe Markdown may link directly to a reviewed public external source URL.
+Unknown or unmigrated recipe targets remain plain text; do not create a broken
+local link or copy an external method to fill the gap.
+
+## Owner-approved release
+
+Authoring a recipe does not commit, push, merge, or deploy it. After reviewing
+the changes and setting publication metadata, the owner integrates the release.
+Pushing approved changes to `main` runs the Pages workflow; manual dispatch is
+also restricted to `main`. Pull requests and other branches do not deploy.
+The build must pass content checks, type checks, documentation lint, browser
+tests, and clean-output verification before uploading only `dist`.
+The owner confirms the successful deployment and actual release date.
 
 ## Preview and verify
 
 ```powershell
 npm run test:content
 npm run check
+npm run lint:docs
 npm run build
+npm run test:e2e
+npm run verify:output
 npm run preview
 ```
 
@@ -129,6 +179,8 @@ Read the actual page at <http://127.0.0.1:4321/recipes/>. Verify ingredients,
 directions, yield, source credit, links, mobile layout, and browser print output.
 Use `npm run test:e2e` for automated Chromium checks. Search uses the built
 Pagefind index; `npm run dev` is for authoring and does not generate that index.
-Run Markdown linting on any documents you change.
+`npm run lint:docs` includes root `AGENTS.md` and `CLAUDE.md`, docs, and all
+`.github` authoring Markdown. Lint changed recipe files separately as well.
 
-Only the owner may approve release, licensing, deployment, and visibility changes.
+Only the owner may approve future releases, licensing, deployment configuration,
+and visibility changes. Public hosting approval is not a new reuse license.

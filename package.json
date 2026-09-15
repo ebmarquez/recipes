@@ -12,6 +12,8 @@
     "check": "astro check",
     "build": "node scripts/validate-content.ts && astro build && pagefind --site dist",
     "test:e2e": "playwright test",
+    "verify:output": "node scripts/verify-output.ts",
+    "lint:docs": "markdownlint README.md AGENTS.md CLAUDE.md \"docs/**/*.md\" \".github/**/*.md\"",
     "preview": "astro preview",
     "astro": "astro"
   },

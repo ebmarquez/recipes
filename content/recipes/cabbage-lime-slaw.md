@@ -14,7 +14,7 @@ tags:
   - no-cook
 prep_time: 10 minutes
 cook_time: 0 minutes
-total_time: 10 minutes
+total_time: 15-20 minutes including rest
 yield: 4-6 servings
 difficulty: Easy
 meal_type: Side Dish
@@ -24,27 +24,26 @@ main_ingredients:
   - Cilantro
 key_technique: Salting and resting the cabbage briefly before serving
 dietary:
-  - Vegan
+  - Vegan without honey
   - Gluten-Free
 special_notes: Inexpensive no-cook side that adds crunch and acidity
 date_created: 2026-09-05
-date_modified: 2026-09-05
+date_modified: 2026-09-14
 prep_minutes: 10
 cook_minutes: 0
-total_minutes: 10
-servings: 4
+total_minutes: null
+servings: null
 slug: cabbage-lime-slaw
-description: "A crisp cabbage slaw with lime and cilantro to balance rich mains."
 publication_status: published
-date_published: null
-source_name: "Original recipe developed with AI assistance"
+date_published: 2026-09-14
+source_name: Original recipe developed with AI assistance
+description: A crisp, inexpensive slaw with lime and cilantro. The acidity balances rich
 ---
 
-## Recipe Overview
+## Overview
 
-A crisp, inexpensive slaw with lime and cilantro. The acidity balances rich
-beef dishes, while the cabbage provides freshness and crunch without a heavy
-mayonnaise dressing.
+A crisp, inexpensive slaw with lime and cilantro. The acidity balances rich beef dishes, while the
+cabbage provides freshness and crunch without a heavy mayonnaise dressing.
 
 ## Ingredients
 
@@ -60,17 +59,16 @@ mayonnaise dressing.
 
 ## Instructions
 
-1. Place the cabbage and onion in a large bowl. Add the salt and gently massage
-   the vegetables for 30 seconds to begin softening the cabbage.
+1. Place the cabbage and onion in a large bowl. Add the salt and gently massage the vegetables for
+   30 seconds to begin softening the cabbage.
 2. Add the jalapeno, cilantro, lime juice, oil, cumin, and black pepper.
 3. Toss thoroughly and let the slaw rest for 5-10 minutes.
-4. Taste and add more lime juice or salt if needed. Serve chilled or at room
-   temperature.
+4. Taste and add more lime juice or salt if needed. Serve chilled or at room temperature.
 
 ## Doneness
 
-The cabbage should remain crisp but become flexible enough to pick up easily
-with a fork. The dressing should taste bright and lightly salty.
+The cabbage should remain crisp but become flexible enough to pick up easily with a fork. The
+dressing should taste bright and lightly salty.
 
 ## Budget Tips
 
@@ -96,3 +94,15 @@ with a fork. The dressing should taste bright and lightly salty.
 - [Budget Beef Picadillo with Potatoes and Jalapeno](../budget-beef-picadillo/)
 - [Calabacitas - Zucchini and Corn](../calabacitas/)
 - Vegetarian Mexican Rice
+
+## Dietary Notes
+
+The base slaw is vegan; the optional teaspoon of honey makes that variation non-vegan. Check
+ingredient labels and cross-contact information for allergies.
+
+## Safe Handling
+
+Refrigerate promptly in shallow containers at 40°F or below, within 2 hours of preparation (1 hour
+above 90°F). Use within 3 days.
+
+[USDA leftover handling guidance](https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety).

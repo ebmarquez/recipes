@@ -22,6 +22,7 @@ pnpm-debug.log*
 # local validation output
 playwright-report/
 test-results/
+.test-build-*/
 coverage/
 
 # macOS-specific files

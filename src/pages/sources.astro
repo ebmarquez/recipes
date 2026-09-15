@@ -1,0 +1,26 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { readSources, publishedSources } from '../lib/sources.ts';
+const sources = publishedSources(await readSources());
+---
+<SiteLayout title="Source library" description="Links to recipes and cooking guides from their original creators. Visit each source for the complete recipe or article.">
+  <section class="wrapper source-library" data-pagefind-ignore aria-labelledby="sources-heading">
+    <p class="eyebrow">From other kitchens</p>
+    <h1 id="sources-heading">Source library</h1>
+    <p class="subtitle">Good ideas, credited to their creators.</p>
+    <p class="notice">These are external references, not recipes hosted here. Follow the link to the original recipe or guide for ingredients and instructions. Publishers control availability and may require sign-in or a subscription.</p>
+    <p class="source-count">{sources.length} {sources.length === 1 ? 'reference' : 'references'}</p>
+    <ul class="recipe-grid source-grid">
+      {sources.map(source => <li class="recipe-card source-card" data-source-card>
+        <article>
+          <p class="eyebrow">External reference &middot; {source.category}</p>
+          <h2><a href={source.source_url} rel="external">{source.title}<span class="visually-hidden"> — at {source.source_name} (external site)</span></a></h2>
+          <p>{source.description}</p>
+          <p class="source-credit">Source: {source.source_name}</p>
+          <div class="card-bottom"><span>{source.cuisine}</span><span>Read at the original source &nearr;</span></div>
+        </article>
+      </li>)}
+    </ul>
+    {sources.length === 0 && <p>No external references have been published yet.</p>}
+  </section>
+</SiteLayout>

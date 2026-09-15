@@ -1,14 +1,19 @@
 ---
 import '../styles/site.css';
+import { canonicalUrl, COLLECTION_NOTE } from '../lib/site.ts';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 const {
   title = 'The Everyday Table',
   description = 'Practical recipes for home cooks. Browse everyday meals, find an ingredient, and get cooking.',
+  noindex = false,
 } = Astro.props;
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const fullTitle = title === 'The Everyday Table' ? title : `${title} | The Everyday Table`;
+const canonical = noindex ? undefined : canonicalUrl(Astro.url.pathname);
 ---
 <!doctype html>
 <html lang="en">
@@ -16,10 +21,16 @@ const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Everyday Table" />
+    {canonical && <meta property="og:url" content={canonical} />}
     <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/svg+xml" href={`${home}favicon.svg`} />
-    <title>{title === 'The Everyday Table' ? title : `${title} | The Everyday Table`}</title>
+    <title>{fullTitle}</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -29,14 +40,18 @@ const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
           <svg aria-hidden="true" viewBox="0 0 40 40" width="36" height="36"><path d="M20 34V14M20 24C7 25 6 12 6 8c9 0 15 5 14 16Zm0-8C20 7 27 4 34 5c0 8-5 14-14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
           <span>The Everyday Table</span>
         </a>
-        <nav aria-label="Main navigation"><a href={`${home}#browse`}>Browse recipes</a></nav>
+        <nav aria-label="Main navigation">
+          <a href={`${home}#browse`}>Browse recipes</a>
+          <a href={`${home}sources/`}>Source library</a>
+        </nav>
       </div>
     </header>
     <main id="main" tabindex="-1"><slot /></main>
     <footer class="site-footer" data-pagefind-ignore>
       <p class="footer-title">Good food. Everyday ingredients.</p>
       <p>The Everyday Table &middot; Practical recipes for home cooks</p>
-      <p class="pilot-note">Private local pilot. Not a live public site.</p>
+      <p class="collection-note">{COLLECTION_NOTE}</p>
+      <p class="rights-note">No additional reuse license is granted. Third-party rights remain with their owners.</p>
     </footer>
   </body>
 </html>

@@ -51,6 +51,11 @@ New entries start as `publication_status: draft`. A draft in a public Git
 repository is still publicly readable: keep genuinely private or rights-unclear
 material outside this repository, its branches, and its pull requests.
 
+Keep externally credited recipes and guides as link-only source-library cards
+in `content\sources.json`; do not reproduce their methods or nutrition here.
+The owner-approved initial release does not authorize publishing future
+additions without review or grant a blanket content/code reuse license.
+
 Never move a recipe to `published`, change repository visibility, enable a
 deployment, or push changes merely because a cooking task is complete. Follow
 the owner's review and publishing instructions.

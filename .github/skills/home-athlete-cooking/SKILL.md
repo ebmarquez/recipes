@@ -54,7 +54,8 @@ family records to infer training schedules.
 - Zero cooking minutes is valid for an uncooked recipe.
 - Use the difficulty vocabulary in the content schema.
 - Preserve original creation dates; update modification dates only for changes.
-- Leave `date_published` null until the owner actually publishes the recipe.
+- Leave `date_published` null while drafting. For an owner-approved release,
+  set its intended release date and confirm it after successful deployment.
 - Start new entries as `publication_status: draft`.
 - Use only supported metadata fields and valid URLs; run the validator rather
   than assuming the template is complete.
@@ -78,6 +79,15 @@ Record known source names and public source URLs. Do not copy chat-share
 links, private document links, internal paths, or personal notes into a recipe.
 Missing source metadata does not prove originality.
 
+The repository is public. The initial release includes uncredited recipes
+after the owner's rights confirmation and editorial review; this is not
+automatic permission for future additions. Externally credited material is
+link-only in `content\sources.json`, not a copied hosted recipe. Follow that
+file's strict schema in `docs\authoring.md` and start new references as drafts.
+Keep external references out of hosted recipe counts and search.
+No additional reuse license is granted, third-party rights are retained,
+and no exclusive copyright over AI-only output is asserted.
+
 Do not claim a recipe has been physically tested unless the owner supplies
 that information. Credit AI assistance honestly without claiming real chef
 credentials.
@@ -87,7 +97,9 @@ repository, pull request, or Git history. Keep private and rights-unclear notes
 outside this repository even during draft work.
 
 No automatic Git push, deployment, visibility change, or publication occurs
-as part of this skill. Owner review is a separate step.
+as part of this skill. Owner review is a separate step. The configured Pages
+workflow deploys approved changes only after integration into `main` and
+successful validation; do not push to trigger it merely because a recipe is done.
 
 ## Food Safety
 
@@ -123,8 +135,8 @@ preferences to the cookbook repository.
 
 ## Validation
 
-Run `npm run test:content`, `npm run check`, and `npm run build` after saved
-recipe changes, plus the Markdown lint command documented in the repository.
+Run `npm run test:content`, `npm run check`, `npm run lint:docs`, and
+`npm run build` after saved recipe changes. Lint changed recipe Markdown too.
 For layout/navigation changes, run `npm run test:e2e`.
 
 Check all changed recipe links and any newly introduced ingredients against

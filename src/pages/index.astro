@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import RecipeCard from '../components/RecipeCard.astro';
 import { recentRecipes } from '../lib/publication.ts';
+import { COLLECTION_NOTE } from '../lib/site.ts';
 const recipes = recentRecipes(await getCollection('recipes'));
 const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
   [...new Set(recipes.flatMap(recipe => recipe.data[key]))].sort((a, b) => a.localeCompare(b));
@@ -12,7 +13,7 @@ const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
     <p class="eyebrow">A little inspiration for your everyday</p>
     <h1>The Everyday Table</h1>
     <p class="subtitle">Practical recipes for home cooks</p>
-    <p class="hero-note">Familiar ingredients. Clear directions. Something good to share.</p>
+    <p class="hero-note collection-note">{COLLECTION_NOTE}</p>
     <a class="button" href="#browse">Find your next meal <span aria-hidden="true">&darr;</span></a>
   </section>
   <section id="browse" class="browse wrapper" aria-labelledby="browse-heading">

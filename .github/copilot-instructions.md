@@ -13,8 +13,13 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
 - A draft flag does not make public Git content private.
 - Do not change visibility, enable deployment, publish a recipe, commit, or
   push without the applicable owner instruction.
-- This repository initially contains a private local pilot. Inclusion in a
-  generated site does not mean a public release has been approved.
+- This repository is public. The owner approved hosting and the reviewed
+  release set, including uncredited recipes whose rights they confirmed.
+  Future recipe/source publication still requires owner approval.
+- Externally credited works are link-only cards in `content\sources.json`.
+  Do not copy their instructions, images, or nutrition into hosted recipes.
+- Publishing approval grants no additional reuse license. Third-party rights
+  remain with their owners; do not claim exclusive rights over AI-only output.
 
 ## Recipes
 
@@ -26,6 +31,10 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
 - Side recommendations should reuse existing recipes; new side pages are opt-in.
 - Do not copy protected prose or photographs without appropriate rights.
 - New recipes start as drafts and require owner publication review.
+- Keep `date_published` null while drafting. For an approved release, use the
+  owner-approved release date and confirm it after a successful deployment.
+- Source cards have their own strict contract; they are not local recipes and
+  do not enter recipe search, recipe counts, or ingredient/time filters.
 
 ## Changes and Verification
 
@@ -37,3 +46,8 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
   silent defaults.
 - Do not add an auto-publishing or auto-push workflow to an authoring skill.
 - Do not include private content in CI artifacts or build outputs.
+- The existing Pages workflow deploys only verified main-branch builds.
+  Recipe creation must not trigger a push or deployment automatically.
+- Use `npm run lint:docs` for all authoring guidance, including `AGENTS.md`
+  and `CLAUDE.md`; lint changed recipe Markdown separately.
+- Run `npm run verify:output` before any deployment artifact upload.

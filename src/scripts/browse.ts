@@ -71,10 +71,11 @@ function restore() {
 form.hidden = false;
 document.querySelector<HTMLElement>('#browse-help')!.hidden = true;
 form.addEventListener('submit', event => { event.preventDefault(); clearTimeout(timer); void update(); });
-form.addEventListener('input', () => {
+form.addEventListener('input', event => {
   ++revision;
   clearTimeout(timer);
-  timer = setTimeout(() => void update(), 180);
+  if (event.target instanceof HTMLSelectElement) void update();
+  else timer = setTimeout(() => void update(), 180);
 });
 form.addEventListener('reset', () => {
   ++revision;

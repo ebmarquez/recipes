@@ -14,7 +14,7 @@ public cookbook.
 ## Menu
 
 | Day | Meal | Preparation or leftover plan |
-|-----|------|-----------------------------|
+| ----- | ------ | ----------------------------- |
 | Monday | | |
 | Tuesday | | |
 | Wednesday | | |

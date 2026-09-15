@@ -1,0 +1,102 @@
+[
+  {
+    "slug": "beef-stroganoff-with-dry-sherry",
+    "title": "Beef Stroganoff",
+    "description": "Billy Parisi's original recipe, saved as a reference for a sherry variation.",
+    "source_name": "Billy Parisi",
+    "source_url": "https://www.billyparisi.com/easy-beef-stroganoff-recipe/",
+    "cuisine": "Russian",
+    "category": "Main Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "best-holiday-ham-with-cherry-citrus-glaze-easy-and-juicy",
+    "title": "Holiday Ham with Cherry-Citrus Glaze",
+    "description": "A holiday ham recipe from Matt Price at Mr. Make It Happen.",
+    "source_name": "Matt Price / Mr. Make It Happen",
+    "source_url": "https://mrmakeithappen.com/best-holiday-ham-with-cherry-citrus-glaze/",
+    "cuisine": "American",
+    "category": "Main Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "birria-tacos-with-consomme",
+    "title": "Birria Tacos with Consomme",
+    "description": "A saved birria taco reel from celinandcenzo. Instagram access may require sign-in.",
+    "source_name": "celinandcenzo / Instagram",
+    "source_url": "https://www.instagram.com/reel/DYdb-CntOVI/",
+    "cuisine": "Mexican",
+    "category": "Main Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "brighten-up-your-holiday-table-with-lemony-garlicky-herby-green-beans",
+    "title": "Green Beans with Sage, Garlic and Lemony Breadcrumbs",
+    "description": "Erin French's green bean side dish, hosted by TODAY.",
+    "source_name": "Erin French / TODAY",
+    "source_url": "https://www.today.com/recipes/green-beans-sage-garlic-breadcrumbs-t298467",
+    "cuisine": "American",
+    "category": "Side Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "chefs-love-this-holiday-roast-and-its-half-the-price-of-prime-rib",
+    "title": "Top Sirloin Roast Guide",
+    "description": "Food & Wine's buying and cooking guide to top sirloin roast. This is an article, not a complete recipe.",
+    "source_name": "Food & Wine",
+    "source_url": "https://www.foodandwine.com/top-sirloin-roast-11865523",
+    "cuisine": "American",
+    "category": "Guide",
+    "publication_status": "published"
+  },
+  {
+    "slug": "fast-beef-kebabs-kofta-style",
+    "title": "Kofta-Style Beef Kebabs",
+    "description": "A saved Instagram source for beef kebabs; the creator's name was not recorded. Sign-in may be required.",
+    "source_name": "Instagram (creator not recorded)",
+    "source_url": "https://www.instagram.com/reel/DRP5dyqj7eF/",
+    "cuisine": "Middle Eastern",
+    "category": "Main Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "garlic-and-parmesan-roasted-carrots",
+    "title": "Garlic and Parmesan Roasted Carrots",
+    "description": "EatingWell's roasted carrot side dish. Read the recipe at its original source.",
+    "source_name": "EatingWell",
+    "source_url": "https://www.eatingwell.com/recipe/263351/garlic-parmesan-roasted-carrots/",
+    "cuisine": "American",
+    "category": "Side Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "melting-beets-with-goat-cheese",
+    "title": "Melting Beets with Goat Cheese",
+    "description": "EatingWell's beet and goat cheese side dish, linked rather than reproduced.",
+    "source_name": "EatingWell",
+    "source_url": "https://www.eatingwell.com/recipe/7923190/melting-beets-with-goat-cheese/",
+    "cuisine": "American",
+    "category": "Side Dish",
+    "publication_status": "published"
+  },
+  {
+    "slug": "molten-chocolate-cakes",
+    "title": "Molten Chocolate Cakes",
+    "description": "A chocolate dessert recipe credited to Kardea Brown on Food Network.",
+    "source_name": "Kardea Brown / Food Network",
+    "source_url": "https://www.foodnetwork.com/recipes/molten-chocolate-cakes-9612799",
+    "cuisine": "French",
+    "category": "Dessert",
+    "publication_status": "published"
+  },
+  {
+    "slug": "simple-spaghetti-carbonara-recipe",
+    "title": "Simple Spaghetti Carbonara",
+    "description": "Claire Saffitz's carbonara recipe on Bon Appetit. Visit the original for the complete method.",
+    "source_name": "Claire Saffitz / Bon Appetit",
+    "source_url": "https://www.bonappetit.com/recipe/simple-spaghetti-carbonara",
+    "cuisine": "Italian",
+    "category": "Main Dish",
+    "publication_status": "published"
+  }
+]

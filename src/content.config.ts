@@ -1,17 +1,18 @@
 import { defineCollection } from 'astro:content';
 import type { Loader } from 'astro/loaders';
 import { fileURLToPath } from 'node:url';
-import { relative, isAbsolute } from 'node:path';
+import { relative, isAbsolute, join } from 'node:path';
 import { recipeSchema } from './lib/recipe-contract.ts';
 import { readRecipes } from './lib/read-recipes.ts';
 import { publishedRecipes } from './lib/publication.ts';
 import { renderRecipe } from './lib/recipe-markdown.ts';
+import { contentDirectory } from './lib/content-directory.ts';
 
 function approvedRecipeLoader(): Loader {
   return {
-    name: 'approved-private-pilot-recipes',
+    name: 'approved-cookbook-recipes',
     async load({ store, parseData, config, watcher, logger }) {
-      const directory = fileURLToPath(new URL('content/recipes/', config.root));
+      const directory = join(contentDirectory(fileURLToPath(config.root)), 'recipes');
       async function sync() {
         const all = await readRecipes(directory);
         const entries = await Promise.all(publishedRecipes(all).map(async recipe => ({

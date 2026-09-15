@@ -37,6 +37,14 @@ section, h2, h3 { scroll-margin-top: 1.5rem; }
 .header-inner { width: min(1280px, calc(100% - 3rem)); margin: auto; min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
 .wordmark { display: flex; align-items: center; gap: .65rem; text-decoration: none; font-size: 1.5rem; }
 .site-header nav a { display: inline-block; padding: .75rem 0; font-size: .95rem; font-weight: 600; }
+.site-header nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1.5rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.source-library { padding-block: 3rem 5rem; }
+.source-card h2 { font-size: 1.55rem; }
+.source-card h2 a { color: inherit; text-decoration: none; }
+.source-card h2 a:hover { text-decoration: underline; }
+.source-card .card-bottom { margin-top: auto; }
+.entry-date { font-size: .85rem; color: var(--muted); }
 .hero { text-align: center; padding-block: 5.5rem 4.5rem; }
 .eyebrow { font-size: .74rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; color: var(--herb); margin-bottom: 1rem; }
 .hero h1 { margin-bottom: 1rem; }
@@ -72,7 +80,8 @@ input[type="search"], select { width: 100%; min-width: 0; min-height: 48px; back
 .notice { padding: 1rem; background: #eff1e7; border-left: 3px solid var(--herb); }
 .site-footer { padding: 3rem 1.5rem; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
 .footer-title { font-size: 1.6rem; color: var(--herb); margin-bottom: .8rem; }
-.pilot-note { font-size: .8rem; margin-bottom: 0; }
+.rights-note { font-size: .8rem; margin-bottom: 0; }
+.collection-note { max-width: 44rem; margin-inline: auto; }
 .recipe { max-width: 800px; padding-block: 2rem 4rem; }
 .back-link { display: inline-block; padding: .5rem 0; margin-bottom: 2rem; }
 .recipe h1 { font-size: clamp(2.3rem, 4.5vw, 3.6rem); }

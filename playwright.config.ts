@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { TEST_URL } from './tests/build-fixtures.ts';
 
 export default defineConfig({
   testDir: './tests',
@@ -9,13 +10,13 @@ export default defineConfig({
   reporter: 'list',
   timeout: 30_000,
   use: {
-    baseURL: 'http://127.0.0.1:4322/recipes/',
+    baseURL: TEST_URL,
     trace: 'retain-on-failure',
     ...devices['Desktop Chrome'],
   },
   webServer: {
-    command: 'node tests/serve-pilot.ts',
-    url: 'http://127.0.0.1:4322/recipes/',
+    command: 'node tests/serve-test-build.ts',
+    url: TEST_URL,
     reuseExistingServer: false,
     timeout: 180_000,
     env: { ASTRO_TELEMETRY_DISABLED: '1' },

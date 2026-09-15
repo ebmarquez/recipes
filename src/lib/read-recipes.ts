@@ -2,8 +2,9 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parseDocument } from 'yaml';
 import { validateRecipes } from './recipe-contract.ts';
+import { contentDirectory } from './content-directory.ts';
 
-export async function readRecipes(directory = join(process.cwd(), 'content', 'recipes')) {
+export async function readRecipes(directory = join(contentDirectory(), 'recipes')) {
   const files = (await readdir(directory, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.md'));
   const input = await Promise.all(files.map(async file => {
     const raw = await readFile(join(directory, file.name), 'utf8');

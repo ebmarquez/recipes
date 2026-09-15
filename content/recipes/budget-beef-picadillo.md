@@ -25,26 +25,26 @@ main_ingredients:
   - Tomato Sauce
 key_technique: Simmering the potatoes in the seasoned tomato and beef broth
 dietary:
-  - Gluten-Free
+  - Gluten-Free with suitable broth and serving choices
 special_notes: Add pinto or black beans to stretch the recipe to six servings
 date_created: 2026-09-05
-date_modified: 2026-09-05
+date_modified: 2026-09-14
 prep_minutes: 10
 cook_minutes: 30
 total_minutes: 40
-servings: 4
+servings: null
 slug: budget-beef-picadillo
-description: "A budget-friendly skillet of browned beef, potatoes, and mild jalapeno in tomato broth."
 publication_status: published
-date_published: null
-source_name: "Original recipe developed with AI assistance"
+date_published: 2026-09-14
+source_name: Original recipe developed with AI assistance
+description: A hearty Mexican-style dinner with deeply browned beef, tender potatoes,
 ---
 
-## Recipe Overview
+## Overview
 
-A hearty Mexican-style dinner with deeply browned beef, tender potatoes,
-tomatoes, and mild jalapeno heat. The potatoes finish cooking in the tomato
-broth so they absorb the seasoning while naturally thickening the sauce.
+A hearty Mexican-style dinner with deeply browned beef, tender potatoes, tomatoes, and mild jalapeno
+heat. The potatoes finish cooking in the tomato broth so they absorb the seasoning while naturally
+thickening the sauce.
 
 **Estimated cost:** $2-$3 per serving
 
@@ -77,32 +77,30 @@ broth so they absorb the seasoning while naturally thickening the sauce.
 
 ### Step 1: Brown the Beef
 
-Heat a large skillet over medium-high heat. Add the beef and cook for 6-8
-minutes, breaking it into small pieces. Let it brown before stirring too often.
-Drain excess grease if necessary.
+Heat a large skillet over medium-high heat. Add the optional oil if needed, then the beef and cook
+for 6-8 minutes, breaking it into small pieces. Let it brown before stirring too often. Drain excess
+grease if necessary.
 
 ### Step 2: Cook the Aromatics
 
-Add the onion and jalapeno. Cook for 3 minutes, until the onion begins to
-soften. Stir in the garlic, cumin, chili powder, oregano, salt, and pepper.
-Cook for 30 seconds, until fragrant.
+Add the onion and jalapeno. Cook for 3 minutes, until the onion begins to soften. Stir in the
+garlic, cumin, chili powder, oregano, salt, and pepper. Cook for 30 seconds, until fragrant.
 
 ### Step 3: Add the Potatoes
 
-Add the potatoes, tomato sauce, and water or broth. Stir well and bring the
-mixture to a gentle simmer.
+Add the potatoes, tomato sauce, and water or broth. Stir well and bring the mixture to a gentle
+simmer.
 
 ### Step 4: Simmer
 
-Cover and reduce the heat to medium-low. Cook for 15-20 minutes, stirring
-occasionally, until the potatoes are fork-tender. Add another splash of water
-if the skillet becomes dry before the potatoes finish cooking.
+Cover and reduce the heat to medium-low. Cook for 15-20 minutes, stirring occasionally, until the
+potatoes are fork-tender. Add another splash of water if the skillet becomes dry before the potatoes
+finish cooking.
 
 ### Step 5: Finish
 
-Stir in the frozen peas and carrots, if using. Cook uncovered for another 3-5
-minutes, until the vegetables are hot and the sauce thickens. Taste and adjust
-the salt.
+Stir in the frozen peas and carrots, if using. Cook uncovered for another 3-5 minutes, until the
+vegetables are hot and the sauce thickens. Taste and adjust the salt.
 
 ### Step 6: Serve
 
@@ -125,11 +123,10 @@ Serve with tortillas or rice and finish with cilantro or a squeeze of lime.
 
 ## Recommended Side Dishes
 
-1. **[Calabacitas - Zucchini and Corn](../calabacitas/)**: The mild sauteed vegetables
-   complement the beef and add color without competing with the picadillo.
-2. **Vegetarian Mexican Rice**: The toasted tomato rice absorbs the
-   picadillo sauce and provides additional carbohydrates for training or
-   recovery.
+1. **[Calabacitas - Zucchini and Corn](../calabacitas/)**: The mild sauteed vegetables complement
+   the beef and add color without competing with the picadillo.
+2. **Vegetarian Mexican Rice**: The toasted tomato rice absorbs the picadillo sauce and provides
+   additional carbohydrates for training or recovery.
 3. **[Cabbage and Lime Slaw](../cabbage-lime-slaw/)**: The cool crunch and lime acidity balance the
    rich beef and potatoes.
 
@@ -137,16 +134,15 @@ Serve with tortillas or rice and finish with cilantro or a squeeze of lime.
 
 Approximate values per serving before tortillas or rice:
 
-| Nutrient | Estimate |
-|----------|----------|
-| Calories | 330 kcal |
-| Protein | 24-27 g |
-| Carbohydrates | 25-30 g |
-| Fat | 13-16 g |
-| Fiber | 3-5 g |
+| Nutrient      | Estimate |
+| ------------- | -------- |
+| Calories      | 330 kcal |
+| Protein       | 24-27 g  |
+| Carbohydrates | 25-30 g  |
+| Fat           | 13-16 g  |
+| Fiber         | 3-5 g    |
 
-Nutrition values are estimates and depend on the beef, serving size, and
-optional vegetables.
+Nutrition values are estimates and depend on the beef, serving size, and optional vegetables.
 
 ## Variations and Substitutions
 
@@ -161,8 +157,7 @@ optional vegetables.
 - Refrigerate in a covered container for 3-4 days.
 - Freeze cooled picadillo for up to 3 months.
 - Thaw overnight in the refrigerator.
-- Reheat in a skillet with a splash of water or broth until it reaches
-  165 degrees F.
+- Reheat in a skillet with a splash of water or broth until it reaches 165 degrees F.
 
 ## Leftover Ideas
 
@@ -197,3 +192,24 @@ optional vegetables.
 - [ ] Salt and black pepper
 - [ ] Tortillas or rice
 - [ ] Pinto or black beans, optional
+
+## Cooking Safety
+
+The beef target remains 160°F. If substituting ground turkey, cook it to 165°F. Keep raw meat and
+its utensils separate from ready-to-eat foods; wash hands and clean work surfaces after handling raw
+meat.
+
+[Safe cooking temperatures](https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures).
+
+## Safe Handling
+
+Refrigerate promptly in shallow containers at 40°F or below, within 2 hours of preparation (1 hour
+above 90°F). Use within 3-4 days. Reheat leftovers to 165°F; bring soups and sauces to a rolling
+boil when reheating. Thaw frozen portions in the refrigerator, not on the counter.
+
+[USDA leftover handling guidance](https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety).
+
+## Dietary Notes
+
+Use gluten-free broth and corn tortillas or rice for the gluten-free version; flour tortillas
+contain wheat. Check ingredient labels and cross-contact information for allergies.

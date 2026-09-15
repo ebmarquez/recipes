@@ -1,93 +1,144 @@
 import { test, expect } from '@playwright/test';
-import { access } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readRecipes } from '../src/lib/read-recipes.ts';
+import { readSources, publishedSources } from '../src/lib/sources.ts';
+import { publishedRecipes } from '../src/lib/publication.ts';
+import { canonicalUrl, publicPages, SITE_BASE } from '../src/lib/site.ts';
+import { publishedFixtures, sourceFixtures, HIDDEN_RECIPE, INGREDIENT_QUERY, EXTERNAL_QUERY, TEST_URL } from './build-fixtures.ts';
 
+const originals = publishedRecipes(await readRecipes());
+const recipes = [...originals, ...publishedFixtures];
+const sources = publishedSources([...await readSources(), ...sourceFixtures]);
 const cards = '[data-recipe-card]:visible';
+const recipePaths = recipes.map(({ data }) => `${data.slug}/`);
+const allPaths = ['./', 'sources/', ...recipePaths];
+const knownQuick = recipes.filter(({ data }) => data.total_minutes !== null && data.total_minutes <= 30);
 
-test('private pilot navigation and Pagefind ingredient search use real base-aware output', async ({ page }) => {
+test('real Pagefind ingredient search excludes source-library references', async ({ page }) => {
   const failures: string[] = [];
   page.on('pageerror', error => failures.push(error.message));
   await page.goto('./');
   await expect(page).toHaveTitle('The Everyday Table');
-  await expect(page.getByRole('heading', { name: 'The Everyday Table', exact: true })).toBeVisible();
-  await expect(page.locator(cards)).toHaveCount(4);
-  const response = page.waitForResponse(response => response.url().includes('/recipes/pagefind/') && response.ok());
-  await page.getByLabel('Search recipes & ingredients').fill('russet');
-  await response;
+  await expect(page.locator(cards)).toHaveCount(recipes.length);
+  const indexed = page.waitForResponse(response => response.url().includes('/recipes/pagefind/') && response.ok());
+  await page.getByLabel('Search recipes & ingredients').fill(INGREDIENT_QUERY);
+  await indexed;
   await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toContainText('Budget Beef Picadillo');
-  await page.locator(cards).getByRole('link').click();
-  await expect(page).toHaveURL(/\/recipes\/budget-beef-picadillo\/$/);
+  await expect(page.locator(cards)).toHaveAttribute('data-url', '/recipes/test-build-thirty-minute-main/');
+  await page.getByLabel('Search recipes & ingredients').fill(EXTERNAL_QUERY);
+  await expect(page.getByRole('status')).toHaveText('0 recipes');
+  expect(await page.evaluate(async query => {
+    const moduleUrl = `${location.origin}/recipes/pagefind/pagefind.js`;
+    const index = await import(moduleUrl);
+    return (await index.search(query)).results.length;
+  }, EXTERNAL_QUERY)).toBe(0);
   expect(failures).toEqual([]);
 });
 
-test('filters combine cuisine, category, main ingredient and known total time', async ({ page }) => {
+test('known-time filters exclude null/over-threshold values and combine with other filters', async ({ page }) => {
   await page.goto('./');
   await page.getByLabel('Known total time').selectOption('30');
-  await expect(page.locator(cards)).toHaveCount(2);
-  const visibleText = (await page.locator(cards).allTextContents()).join(' ');
-  expect(visibleText).not.toContain('Synthetic variable-time soup');
-  expect(visibleText).not.toContain('Budget Beef');
-  await page.getByLabel('Cuisine', { exact: true }).selectOption('Mexican');
+  await expect(page.locator(cards)).toHaveCount(knownQuick.length);
+  for (const slug of ['test-build-variable-soup', 'test-build-long-main']) {
+    await expect(page.locator(`[data-url="/recipes/${slug}/"]`)).toBeHidden();
+  }
+  for (const slug of ['test-build-zero-cook-side', 'test-build-thirty-minute-main']) {
+    await expect(page.locator(`[data-url="/recipes/${slug}/"]`)).toBeVisible();
+  }
+  await page.getByLabel('Cuisine', { exact: true }).selectOption('Fixture Japanese');
+  await page.getByLabel('Category', { exact: true }).selectOption('Fixture Main');
+  await page.getByLabel('Main ingredient').selectOption('Carrot');
   await expect(page.locator(cards)).toHaveCount(1);
-  await page.getByLabel('Category', { exact: true }).selectOption('Side Dish');
-  await page.getByLabel('Main ingredient').selectOption('Zucchini');
-  await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toContainText('Calabacitas');
+  await expect(page.locator(cards)).toHaveAttribute('data-url', '/recipes/test-build-thirty-minute-main/');
   await page.getByRole('button', { name: 'Clear filters' }).click();
-  await expect(page.locator(cards)).toHaveCount(4);
-  await page.getByLabel('Category', { exact: true }).selectOption('Soup');
+  await expect(page.locator(cards)).toHaveCount(recipes.length);
+  await page.getByLabel('Category', { exact: true }).selectOption('Fixture Soup');
   await expect(page.locator(cards)).toHaveCount(1);
   await page.getByLabel('Known total time').selectOption('30');
   await expect(page.locator(cards)).toHaveCount(0);
   await expect(page.getByText('No recipes match.', { exact: false })).toBeVisible();
 });
 
-test('search and filter state survive a reload and intersect', async ({ page }) => {
-  await page.goto('./?q=cilantro&time=30');
-  await expect(page.locator(cards)).toHaveCount(2);
-  await expect(page.getByRole('alert')).toBeHidden();
-  await expect(page.getByRole('status')).toHaveText('2 recipes');
-  await page.getByLabel('Main ingredient').selectOption('Cabbage');
-  await expect(page.locator(cards)).toHaveCount(1);
-  await page.reload();
-  await expect(page.getByLabel('Search recipes & ingredients')).toHaveValue('cilantro');
-  await expect(page.getByLabel('Main ingredient')).toHaveValue('Cabbage');
-  await expect(page.locator(cards)).toHaveCount(1);
+test('category and cuisine options reflect the entire published collection', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto('./');
+  for (const [name, key] of [['Cuisine', 'cuisine'], ['Category', 'category']] as const) {
+    const expected = [...new Set(recipes.map(recipe => recipe.data[key]))].sort((a, b) => a.localeCompare(b));
+    expect(expected.length).toBeGreaterThan(1);
+    expect(await page.getByLabel(name, { exact: true }).locator('option').evaluateAll(options =>
+      options.map(option => (option as HTMLOptionElement).value).filter(Boolean))).toEqual(expected);
+    for (const value of expected) {
+      await page.getByLabel(name, { exact: true }).selectOption(value);
+      await expect(page.locator(cards)).toHaveCount(recipes.filter(recipe => recipe.data[key] === value).length);
+    }
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+    await expect(page.locator(cards)).toHaveCount(recipes.length);
+  }
 });
 
-test('search failure is explicit and browsing remains usable', async ({ page }) => {
+test('search/filter state survives reload and unavailable search is explicit', async ({ page }) => {
+  await page.goto(`./?q=${INGREDIENT_QUERY}&time=30`);
+  await expect(page.getByRole('status')).toHaveText('1 recipe');
+  await expect(page.getByRole('alert')).toBeHidden();
+  await page.getByLabel('Category', { exact: true }).selectOption('Fixture Main');
+  await expect(page).toHaveURL(/category=Fixture\+Main/);
+  await page.reload();
+  await expect(page.getByLabel('Search recipes & ingredients')).toHaveValue(INGREDIENT_QUERY);
+  await expect(page.getByLabel('Category', { exact: true })).toHaveValue('Fixture Main');
+  await expect(page.locator(cards)).toHaveCount(1);
   await page.route('**/pagefind/**', route => route.abort());
   await page.goto('./');
-  await page.getByLabel('Search recipes & ingredients').fill('carrot');
+  await page.getByLabel('Search recipes & ingredients').fill(INGREDIENT_QUERY);
   await expect(page.getByRole('alert')).toContainText('Search is unavailable');
   await expect(page.getByRole('status')).toContainText('search unavailable');
-  await page.getByLabel('Category', { exact: true }).selectOption('Soup');
+  await page.getByLabel('Category', { exact: true }).selectOption('Fixture Soup');
   await expect(page.locator(cards)).toHaveCount(1);
 });
 
-test('draft routes, search and related URLs never leak', async ({ page, request }) => {
-  const response = await request.get('test-pilot-hidden-draft/');
-  expect(response.status()).toBe(404);
-  await expect(access(join(process.cwd(), 'dist', 'test-pilot-hidden-draft'))).rejects.toThrow();
-  await page.goto('test-pilot-variable-soup/');
+test('draft recipes and source references never expose routes, links or searchable data', async ({ page, request }) => {
+  expect((await request.get(`${HIDDEN_RECIPE}/`)).status()).toBe(404);
+  expect((await request.get('test-build-hidden-source/')).status()).toBe(404);
+  await page.goto('test-build-variable-soup/');
   await expect(page.getByText('Future recipe', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Future recipe' })).toHaveCount(0);
-  expect(await page.content()).not.toContain('test-pilot-hidden-draft');
+  expect(await page.content()).not.toContain(HIDDEN_RECIPE);
   await page.goto('./');
-  await page.getByLabel('Search recipes & ingredients').fill('DRAFTONLYBODYSENTINEL');
-  await expect(page.getByRole('status')).toHaveText('0 recipes');
+  for (const query of ['DRAFTRECIPEBODYSENTINEL', 'DRAFTSOURCETITLESENTINEL']) {
+    await page.getByLabel('Search recipes & ingredients').fill(query);
+    await expect(page.getByRole('status')).toHaveText('0 recipes');
+  }
+  await page.goto('sources/');
+  expect(await page.content()).not.toContain('DRAFTSOURCE');
+  expect(await page.content()).not.toContain('test-build-hidden-source');
 });
 
-test('recipe jumps, labeled ingredient controls, source and print layout', async ({ page }) => {
-  await page.goto('budget-beef-picadillo/');
+test('source library contains only labeled external cards, never copied recipe methods', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('navigation').getByRole('link', { name: 'Source library' }).click();
+  await expect(page).toHaveURL(/\/recipes\/sources\/$/);
+  await expect(page.getByRole('heading', { name: 'Source library', exact: true })).toBeVisible();
+  await expect(page.getByText('These are external references', { exact: false })).toBeVisible();
+  await expect(page.getByText('Publishers control availability and may require sign-in or a subscription.', { exact: false })).toBeVisible();
+  const sourceCards = page.locator('[data-source-card]');
+  await expect(sourceCards).toHaveCount(sources.length);
+  for (const [index, source] of sources.entries()) {
+    const card = sourceCards.nth(index);
+    await expect(card.getByRole('link')).toHaveAttribute('href', source.source_url);
+    await expect(card).toContainText(`Source: ${source.source_name}`);
+    await expect(card).toContainText(source.description);
+    await expect(card).toContainText('External reference');
+    await expect(card.locator('input, ol, table, .recipe-body, [data-recipe-page]')).toHaveCount(0);
+  }
+  await expect(page.locator('[data-pagefind-body], [data-recipe-card]')).toHaveCount(0);
+});
+
+test('recipe controls preserve numbered step headings, labeled ingredients, dates and print', async ({ page }) => {
+  await page.goto('test-build-thirty-minute-main/');
   await page.getByRole('link', { name: 'Jump to ingredients' }).click();
   await expect(page).toHaveURL(/#ingredients$/);
   expect(await page.locator('#ingredients').evaluate(element => element.getBoundingClientRect().top)).toBeLessThan(50);
   const checkboxes = page.getByRole('checkbox');
-  expect(await checkboxes.count()).toBeGreaterThan(10);
-  await page.getByLabel('1 pound ground beef, preferably 85% lean', { exact: true }).check();
-  await expect(page.getByLabel('1 pound ground beef, preferably 85% lean', { exact: true })).toBeChecked();
+  await expect(checkboxes).toHaveCount(2);
+  await page.getByLabel(`1 spoon ${INGREDIENT_QUERY}`, { exact: true }).check();
   for (const checkbox of await checkboxes.all()) {
     expect(await checkbox.evaluate(element => {
       const input = element as HTMLInputElement;
@@ -104,13 +155,12 @@ test('recipe jumps, labeled ingredient controls, source and print layout', async
   })).toBe(true);
   await page.getByRole('link', { name: 'Jump to directions' }).click();
   await expect(page).toHaveURL(/#directions$/);
-  await expect(page.getByText('4-5 servings', { exact: true })).toBeVisible();
-  await expect(page.getByText('Source: Original recipe developed with AI assistance')).toBeVisible();
-  await expect(page.locator('table')).toContainText('Estimate');
+  await expect(page.getByRole('heading', { name: 'Step 1: Combine' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Step 2: Finish' })).toBeVisible();
+  await expect(page.getByText('4-6 servings', { exact: true })).toBeVisible();
+  await expect(page.locator('time')).toHaveAttribute('datetime', '2026-09-14');
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
-  await page.evaluate(() => {
-    window.print = () => { document.documentElement.dataset.printCalled = 'true'; };
-  });
+  await page.evaluate(() => { window.print = () => { document.documentElement.dataset.printCalled = 'true'; }; });
   await page.getByRole('button', { name: 'Print recipe' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-print-called', 'true');
   await page.emulateMedia({ media: 'print' });
@@ -121,60 +171,97 @@ test('recipe jumps, labeled ingredient controls, source and print layout', async
   expect(await page.locator('.ingredient label').first().evaluate(element => getComputedStyle(element).textDecorationLine)).toBe('none');
   const pdf = await page.pdf({ format: 'A4' });
   expect(pdf.subarray(0, 4).toString()).toBe('%PDF');
-  expect(pdf.length).toBeGreaterThan(1000);
 });
 
-test('all approved direct pages and same-origin links resolve with private metadata', async ({ page, request }) => {
-  for (const slug of ['budget-beef-picadillo', 'calabacitas', 'cabbage-lime-slaw']) {
-    await page.goto(`${slug}/`);
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+test('every public page has the correct canonical, social metadata and working same-origin links', async ({ page, request }) => {
+  test.setTimeout(90_000);
+  const checked = new Set<string>();
+  for (const path of allPaths) {
+    expect((await page.goto(path))?.status()).toBe(200);
+    const pathname = new URL(page.url()).pathname;
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonicalUrl(pathname));
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', canonicalUrl(pathname));
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', await page.title());
+    await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',
+      (await page.locator('meta[name="description"]').getAttribute('content'))!);
+    await expect(page.locator('meta[property="og:image"]')).toHaveCount(0);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+    const caveat = 'A personal collection of recipes I have made or want to make. Sources are credited and linked where known; not every recipe has been tested.';
+    await expect(page.locator('.site-footer .collection-note')).toHaveText(caveat);
+    await expect(page.locator('.site-footer .collection-note')).toBeVisible();
+    if (path === './') await expect(page.locator('.hero .collection-note')).toHaveText(caveat);
+    const recipe = recipes.find(item => pathname === `${SITE_BASE}${item.data.slug}/`);
+    if (recipe) {
+      const credit = page.locator('.recipe-header .source-credit');
+      await expect(credit).toHaveText(`Source: ${recipe.data.source_name}`);
+      if (recipe.data.source_url) await expect(credit.getByRole('link')).toHaveAttribute('href', recipe.data.source_url);
+    }
+    if (recipe?.data.date_published) await expect(page.locator('time')).toHaveAttribute('datetime', recipe.data.date_published);
     const links = await page.locator('a[href^="/"], link[href^="/"], script[src^="/"]').evaluateAll(elements =>
       [...new Set(elements.map(element => element.getAttribute('href') ?? element.getAttribute('src')!))]);
     for (const link of links) {
-      expect(link.startsWith('/recipes/')).toBe(true);
+      expect(link.startsWith(SITE_BASE)).toBe(true);
+      expect(link.includes('/recipes/recipes/')).toBe(false);
+      if (checked.has(link)) continue;
       expect((await request.get(link)).status(), link).toBe(200);
+      checked.add(link);
     }
   }
 });
 
-test('no-JavaScript reading, ingredient checking, related links and print remain available', async ({ browser }) => {
+test('sitemap and robots include only real public pages, and 404 stays noindex', async ({ page, request }) => {
+  const sitemap = await request.get('sitemap.xml');
+  expect(sitemap.status()).toBe(200);
+  expect(sitemap.headers()['content-type']).toContain('xml');
+  const xml = await sitemap.text();
+  const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  expect(locations).toEqual(publicPages(recipes).map(item => item.url));
+  for (const forbidden of ['404', HIDDEN_RECIPE, 'test-build-hidden-source', 'test-build-public-source']) {
+    expect(xml).not.toContain(forbidden);
+  }
+  const robots = await request.get('robots.txt');
+  expect(robots.status()).toBe(200);
+  expect(await robots.text()).toContain('Sitemap: https://ebmarquez.github.io/recipes/sitemap.xml');
+  expect(await robots.text()).toContain('Allow: /recipes/');
+  expect((await page.goto('not-a-real-recipe/'))?.status()).toBe(404);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+});
+
+test('no-JavaScript reading, ingredient checking, source navigation and print remain usable', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   try {
     const page = await context.newPage();
-    await page.goto('http://127.0.0.1:4322/recipes/');
-    await expect(page.locator(cards)).toHaveCount(4);
+    await page.goto(TEST_URL);
+    await expect(page.locator(cards)).toHaveCount(recipes.length);
     await expect(page.getByText('All recipes are listed below.', { exact: false })).toBeVisible();
     await expect(page.getByRole('search')).toBeHidden();
-    await page.getByRole('link', { name: 'Calabacitas - Zucchini and Corn', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Ingredients', exact: true })).toBeVisible();
+    await page.getByRole('link', { name: 'Synthetic no-cook side', exact: true }).click();
     await page.getByRole('link', { name: 'Jump to directions' }).click();
     await expect(page).toHaveURL(/#directions$/);
     await page.getByRole('checkbox').first().check();
     await expect(page.getByRole('checkbox').first()).toBeChecked();
-    await page.getByRole('link', { name: 'Cabbage and Lime Slaw', exact: true }).click();
-    await expect(page).toHaveURL(/\/recipes\/cabbage-lime-slaw\/$/);
     await expect(page.getByText('0 minutes', { exact: true })).toBeVisible();
     await page.emulateMedia({ media: 'print' });
     await expect(page.locator('#directions')).toBeVisible();
     await expect(page.locator('.site-header')).toBeHidden();
+    await page.emulateMedia({ media: 'screen' });
+    await page.getByRole('navigation').getByRole('link', { name: 'Source library' }).click();
+    await expect(page.locator('[data-source-card]')).toHaveCount(sources.length);
   } finally {
     await context.close();
   }
 });
 
-test('390px layout has no sideways scroll and supports keyboard focus', async ({ page }, testInfo) => {
+test('all pages fit 390px without sideways scroll and offer keyboard focus', async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const path of ['./', 'budget-beef-picadillo/', 'calabacitas/', 'cabbage-lime-slaw/', 'test-pilot-variable-soup/']) {
-    const response = await page.goto(path);
-    expect(response?.status()).toBe(200);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  for (const path of allPaths) {
+    await page.goto(path);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true);
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
     expect(await page.getByRole('link', { name: 'Skip to content' }).evaluate(element => getComputedStyle(element).outlineStyle)).toBe('solid');
-    if (path === './') await page.screenshot({ path: testInfo.outputPath('home-mobile.png'), fullPage: true });
+    if (path === 'sources/') await page.screenshot({ path: testInfo.outputPath('sources-mobile.png'), fullPage: true });
   }
-  await page.goto('budget-beef-picadillo/');
-  await expect(page.getByRole('link', { name: 'Vegetarian Mexican Rice' })).toHaveCount(0);
-  const links = await page.locator('a[href^="/"]').evaluateAll(elements => elements.map(element => element.getAttribute('href')!));
-  expect(links.every(link => link.startsWith('/recipes/') && !link.includes('/recipes/recipes/'))).toBe(true);
 });
