@@ -2,8 +2,12 @@ import type { Recipe } from './recipe-contract.ts';
 
 type WithRecipe = { data: Recipe };
 
+export function isPublished(item: { publication_status: 'draft' | 'published' }): boolean {
+  return item.publication_status === 'published';
+}
+
 export function publishedRecipes<T extends WithRecipe>(recipes: T[]): T[] {
-  return recipes.filter(({ data }) => data.publication_status === 'published');
+  return recipes.filter(({ data }) => isPublished(data));
 }
 
 export function recentRecipes<T extends WithRecipe>(recipes: T[]): T[] {

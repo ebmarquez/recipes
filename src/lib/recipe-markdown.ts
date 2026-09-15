@@ -157,7 +157,14 @@ export async function renderRecipe(entry: RecipeEntry, entries: RecipeEntry[], b
       const listItem = item as ListItem;
       let id = `ingredient-${++ingredient}`;
       while (headingIds.has(id)) id = `ingredient-${++ingredient}`;
-      listItem.data = { ...listItem.data, hProperties: { className: ['ingredient'], 'data-ingredient-id': id } };
+      // Pagefind skips labels; index text derived from this same Markdown item.
+      const ingredientText = listItem.children.filter(child => child.type !== 'list').map(child => toString(child)).join(' ');
+      listItem.data = { ...listItem.data, hProperties: {
+        className: ['ingredient'],
+        'data-ingredient-id': id,
+        'data-ingredient-text': ingredientText,
+        'data-pagefind-index-attrs': 'data-ingredient-text',
+      } };
     });
   }
   const processor = unified().use(remarkRehype).use(() => (htmlTree: TreeNode) => {

@@ -21,6 +21,7 @@ const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
       <p class="eyebrow">{data.cuisine} <span aria-hidden="true">&middot;</span> {data.category}</p>
       <h1 data-pagefind-meta="title">{data.title}</h1>
       <p class="recipe-description" data-pagefind-meta="description">{data.description}</p>
+      {data.date_published && <p class="entry-date" data-pagefind-ignore>Published <time datetime={data.date_published}>{new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${data.date_published}T00:00:00Z`))}</time></p>}
       <div class="recipe-actions" data-pagefind-ignore>
         <a class="button" href="#ingredients">Jump to ingredients</a>
         <a class="button button-outline" href="#directions">Jump to directions</a>

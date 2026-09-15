@@ -32,6 +32,8 @@ Explain why the dish works in one or two sentences. Replace every placeholder
 and set actual creation/modification dates before saving a real recipe.
 Add source information only when known, never assume missing attribution
 means original content.
+This repository is public, even for drafts. Do not include private schedules
+or personal notes. External works belong in the link-only source library.
 
 ## Ingredients
 

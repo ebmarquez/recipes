@@ -102,6 +102,8 @@ test('checkboxes are labeled and ingredient-only; jump headings are stable', asy
   const { html } = await renderRecipe(recipe, [recipe], '/recipes/');
   assert.equal((html.match(/type="checkbox"/g) ?? []).length, 2);
   assert.equal((html.match(/<label/g) ?? []).length, 2);
+  assert.ok(html.includes('data-pagefind-index-attrs="data-ingredient-text"'));
+  assert.ok(html.includes('data-ingredient-text="1 carrot"'));
   assert.ok(html.includes('id="ingredients"'));
   assert.ok(html.includes('id="directions"'));
   assert.ok(!html.split('id="directions"')[1].includes('type="checkbox"'));

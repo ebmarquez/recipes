@@ -27,23 +27,23 @@ dietary:
   - Gluten-Free
 special_notes: Use frozen corn for an inexpensive year-round version
 date_created: 2026-09-05
-date_modified: 2026-09-05
+date_modified: 2026-09-14
 prep_minutes: 10
 cook_minutes: 12
 total_minutes: 22
 servings: 4
 slug: calabacitas
-description: "A quick vegetable side with browned zucchini, sweet corn, cumin, and a bright lime finish."
 publication_status: published
-date_published: null
-source_name: "Original recipe developed with AI assistance"
+date_published: 2026-09-14
+source_name: Original recipe developed with AI assistance
+description: A quick Mexican-style vegetable side with browned zucchini, sweet corn, onion,
 ---
 
-## Recipe Overview
+## Overview
 
-A quick Mexican-style vegetable side with browned zucchini, sweet corn, onion,
-and cumin. It adds color and vegetables to rich beef dishes without requiring
-expensive ingredients or special equipment.
+A quick Mexican-style vegetable side with browned zucchini, sweet corn, onion, and cumin. It adds
+color and vegetables to rich beef dishes without requiring expensive ingredients or special
+equipment.
 
 ## Ingredients
 
@@ -60,19 +60,19 @@ expensive ingredients or special equipment.
 
 ## Instructions
 
-1. Heat a large skillet over medium-high heat. Add the oil and onion, then cook
-   for 2-3 minutes until the onion begins to soften.
-2. Add the zucchini in an even layer. Leave it undisturbed for 2 minutes to
-   develop color, then stir and cook for another 3 minutes.
-3. Add the corn, garlic, cumin, salt, and pepper. Cook for 3-4 minutes until the
-   corn is hot and the zucchini is tender but not mushy.
-4. Remove the skillet from the heat. Stir in the lime juice and cilantro, then
-   taste and adjust the salt.
+1. Heat a large skillet over medium-high heat. Add the oil and onion, then cook for 2-3 minutes
+   until the onion begins to soften.
+2. Add the zucchini in an even layer. Leave it undisturbed for 2 minutes to develop color, then stir
+   and cook for another 3 minutes.
+3. Add the corn, garlic, cumin, salt, and pepper. Cook for 3-4 minutes until the corn is hot and the
+   zucchini is tender but not mushy.
+4. Remove the skillet from the heat. Stir in the lime juice and cilantro, then taste and adjust the
+   salt.
 
 ## Doneness
 
-The zucchini should be lightly browned and tender enough to pierce with a fork
-while retaining some structure.
+The zucchini should be lightly browned and tender enough to pierce with a fork while retaining some
+structure.
 
 ## Budget Tips
 
@@ -97,3 +97,16 @@ while retaining some structure.
 - [Budget Beef Picadillo with Potatoes and Jalapeno](../budget-beef-picadillo/)
 - Vegetarian Mexican Rice
 - [Cabbage and Lime Slaw](../cabbage-lime-slaw/)
+
+## Dietary Notes
+
+Optional cheese adds milk; choose vegetarian-rennet cheese if that matters to your diet. The base
+vegetables contain no dairy. Check ingredient labels and cross-contact information for allergies.
+
+## Safe Handling
+
+Refrigerate promptly in shallow containers at 40°F or below, within 2 hours of preparation (1 hour
+above 90°F). Use within 4 days. Reheat leftovers to 165°F; bring soups and sauces to a rolling boil
+when reheating. Thaw frozen portions in the refrigerator, not on the counter.
+
+[USDA leftover handling guidance](https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety).

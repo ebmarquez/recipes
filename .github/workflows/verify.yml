@@ -1,0 +1,53 @@
+name: Verify cookbook build
+
+on:
+  workflow_call:
+    inputs:
+      upload-pages:
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
+        with:
+          persist-credentials: false
+      - name: Set up tested Node runtime
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0, Node 24
+        with:
+          node-version: "26.7.0"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+      - name: Validate recipes and source references
+        run: npm run test:content
+      - name: Check Astro and TypeScript
+        run: npm run check
+      - name: Lint all site and authoring documentation
+        run: npm run lint:docs
+      - name: Build static site and recipe search index
+        run: npm run build
+      - name: Install test browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Verify browser behavior and restore real content build
+        run: npm run test:e2e
+      - name: Verify clean release output
+        run: npm run verify:output
+      - name: Upload only the verified static site
+        if: inputs.upload-pages && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+          retention-days: 1
