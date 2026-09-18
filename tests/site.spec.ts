@@ -48,6 +48,28 @@ test('published photos load with alt text, captions and credit while draft and u
   }
 });
 
+test('homepage exposes the blog before the recipe list on desktop, mobile, and without JavaScript', async ({ browser }) => {
+  for (const [width, javaScriptEnabled] of [[1280, true], [390, true], [390, false]] as const) {
+    const context = await browser.newContext({ viewport: { width, height: 844 }, javaScriptEnabled });
+    try {
+      const page = await context.newPage();
+      await page.goto(TEST_URL);
+      const link = page.getByRole('link', { name: 'Read the blog', exact: true });
+      await expect(link).toHaveAttribute('href', '/recipes/blog/');
+      await expect(link).toBeInViewport();
+      const blogTop = await page.locator('[aria-labelledby="latest-blog-heading"]').evaluate(element => element.getBoundingClientRect().top);
+      const recipesTop = await page.locator('#browse').evaluate(element => element.getBoundingClientRect().top);
+      expect(blogTop).toBeLessThan(recipesTop);
+      await link.click();
+      await expect(page).toHaveURL(`${TEST_URL}blog/`);
+      await page.getByRole('link', { name: 'Synthetic kitchen note', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'Synthetic kitchen note', exact: true })).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  }
+});
+
 test('blog navigation, chronology, recipe references and homepage previews use only published posts', async ({ page, request }) => {
   await page.goto('./');
   await expect(page.getByRole('link', { name: 'Local drafts', exact: true })).toHaveCount(0);

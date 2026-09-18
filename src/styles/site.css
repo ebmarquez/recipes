@@ -60,6 +60,7 @@ section, h2, h3 { scroll-margin-top: 1.5rem; }
 .hero h1 { margin-bottom: 1rem; }
 .subtitle { font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.3rem, 3vw, 1.7rem); }
 .hero-note { color: var(--muted); margin-bottom: 2rem; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 1.2rem; padding: .75rem 1.15rem; min-height: 48px; border-radius: 4px; background: var(--herb); border: 1px solid var(--herb); color: white; text-decoration: none; font-weight: 600; }
 .button:hover { background: #254631; }
 .button-outline { background: transparent; color: var(--herb); }

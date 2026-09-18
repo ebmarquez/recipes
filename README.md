@@ -82,8 +82,9 @@ printing remain available.
 
 ## Kitchen blog and authoring agents
 
-The **Blog** navigation opens `/recipes/blog/`. Published posts appear newest
-first, link to an optional featured recipe, and appear in the home page's latest
+The **Blog** navigation and the home page's **Read the blog** button open
+`/recipes/blog/`. Published posts appear newest first, link to an optional
+featured recipe, and appear above the recipe browser in the home page's latest
 posts section. Only owner-approved posts appear on the public site.
 
 Start a public-safe draft in `content\blog` using
