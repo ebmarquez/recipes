@@ -103,7 +103,7 @@ External links accept HTTP(S) only; protocol-relative URLs, credentials, control
 characters, unsafe schemes, traversal paths, and malformed URLs fail validation.
 
 The renderer adds Astro's configured base to published recipe links.
-The default route is `/recipes/<slug>/`. Keep slugs stable after real publication.
+The custom-domain route is `/<slug>/`. Keep slugs stable after real publication.
 A typo pointing to an unknown recipe fails the build with a file/link error.
 A link to an existing `draft` becomes plain display text, without its draft URL.
 An unmigrated recipe should be ordinary text, not a pretend link.
@@ -193,7 +193,7 @@ npm run verify:output
 npm run preview
 ```
 
-Read the actual page at <http://127.0.0.1:4321/recipes/>. Verify ingredients,
+Read the actual page at <http://127.0.0.1:4321/>. Verify ingredients,
 directions, yield, source credit, links, mobile layout, and browser print output.
 Use `npm run test:e2e` for automated Chromium checks. Search uses the built
 Pagefind index; `npm run dev` is for authoring and does not generate that index.
@@ -204,7 +204,7 @@ npm run dev -- --host 127.0.0.1 --port 4321
 ```
 
 Choose **Local drafts** in the navigation, or open
-<http://127.0.0.1:4321/recipes/local-drafts/>.
+<http://127.0.0.1:4321/local-drafts/>.
 Draft pages use the same article and photo layout as published posts, with a
 clear draft banner. Refresh after editing a post. Featured recipes link only
 when published; draft targets remain plain text. Keep this authoring server
@@ -260,8 +260,8 @@ Checklist prompts render as ordinary bullets, not recipe ingredient controls.
 The recipe remains the method's source of truth; use links rather than copied
 instructions. Blog claims must reflect the owner's account, not AI experience.
 
-Blog URLs are `<configured-base>/blog/<slug>/`, normally
-`/recipes/blog/<slug>/`. Within blog Markdown, use:
+Blog URLs use the configured base, currently `/blog/<slug>/` on the
+custom domain. Within blog Markdown, use:
 
 ```markdown
 [The recipe](../../korean-beef-lettuce-wraps/)
@@ -279,7 +279,7 @@ timing, rather than separate blog copies. Recipe Markdown keeps its existing
 Published posts appear newest publication date first (slug breaks date ties)
 on the blog index. The home page links to the blog without displaying post
 previews. Posts enter the Pagefind index and sitemap.
-`/recipes/search/` searches both recipes and posts;
+`/search/` searches both recipes and posts;
 the home page's ingredient/time filters and recipe counts remain recipe-only.
 External source cards remain outside Pagefind. Draft posts are validated but
 excluded before Astro's content store, production HTML, search, and sitemap
@@ -366,7 +366,7 @@ decodability, valid dimensions, and stripped metadata. Do not bypass the importe
 by renaming a JPEG or adding metadata back to a WebP.
 
 Only photos referenced by published recipes or posts receive a generated URL,
-normally `/recipes/photos/dinner.webp`. Draft-only and unreferenced photos
+normally `/photos/dinner.webp`. Draft-only and unreferenced photos
 are excluded entirely from the build, not merely hidden from the page.
 A photo shared with a published entry is public even if a draft also uses it.
 The release verifier checks the exact emitted photo list and file bytes.

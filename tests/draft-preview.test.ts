@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import { stringify } from 'yaml';
 import { astroBin } from './build-helpers.ts';
 import { entry, copyBlogTemplate } from './fixtures.ts';
+import { SITE_BASE } from '../src/lib/site.ts';
 
 test('development previews draft prose and photos without exposing them on public routes', { timeout: 90_000 }, async () => {
   const directory = await mkdtemp(join(process.cwd(), '.test-build-draft-preview-'));
@@ -34,7 +35,7 @@ test('development previews draft prose and photos without exposing them on publi
     const photo = await sharp({ create: { width: 64, height: 48, channels: 3, background: '#345740' } }).webp().toBuffer();
     await save(join(directory, 'photos', 'preview-photo.webp'), photo);
     const origin = 'http://127.0.0.1:4333';
-    const base = `${origin}/recipes/`;
+    const base = `${origin}${SITE_BASE}`;
     child = spawn(process.execPath, [astroBin, 'dev', '--host', '127.0.0.1', '--port', '4333'], {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1', COOKBOOK_TEST_CONTENT_DIR: directory },
@@ -62,12 +63,12 @@ test('development previews draft prose and photos without exposing them on publi
       }
     }
     assert.ok(ready, `Draft preview server did not become ready: ${output}`);
-    const query = '?note=two%20bowls&return=%2Frecipes%2F';
+    const query = `?note=two%20bowls&return=${encodeURIComponent(SITE_BASE)}`;
     for (const path of ['local-drafts', 'local-drafts/blog/preview-note']) {
       for (const method of ['GET', 'HEAD']) {
         const redirect = await fetch(`${base}${path}${query}`, { method, redirect: 'manual' });
         assert.equal(redirect.status, 307, `${method} ${path} should redirect instead of showing a trailing-slash warning`);
-        assert.equal(redirect.headers.get('location'), `/recipes/${path}/${query}`);
+        assert.equal(redirect.headers.get('location'), `${SITE_BASE}${path}/${query}`);
         assert.equal(redirect.headers.get('cache-control'), 'no-store');
       }
       const followed = await fetch(`${base}${path}${query}`);
@@ -84,8 +85,8 @@ test('development previews draft prose and photos without exposing them on publi
     assert.ok(html.includes('Local draft preview'));
     assert.ok(html.includes('content="noindex, follow"'));
     assert.ok(!html.includes('rel="canonical"') && !html.includes('data-pagefind-body'));
-    assert.ok(html.includes(`/recipes/${recipe.data.slug}/`));
-    assert.ok(html.includes('src="/recipes/local-drafts/photos/preview-photo.webp"'));
+    assert.ok(html.includes(`${SITE_BASE}${recipe.data.slug}/`));
+    assert.ok(html.includes(`src="${SITE_BASE}local-drafts/photos/preview-photo.webp"`));
     const image = await fetch(`${base}local-drafts/photos/preview-photo.webp`);
     assert.equal(image.status, 200, `Draft image ${image.url}: ${output}`);
     assert.equal(image.redirected, false, 'Photo filenames must not receive trailing slashes');

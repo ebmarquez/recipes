@@ -23,7 +23,7 @@ test('published photos load with alt text, captions and credit while draft and u
     await page.goto(path);
     const image = page.getByRole('img', { name: alt });
     await image.scrollIntoViewIfNeeded();
-    await expect(image).toHaveAttribute('src', `/recipes/photos/${filename}`);
+    await expect(image).toHaveAttribute('src', `${SITE_BASE}photos/${filename}`);
     await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     await expect(page.locator('.photo-credit')).toHaveText('Synthetic image for testing.');
     const response = await request.get(`photos/${filename}`);
@@ -55,12 +55,12 @@ test('homepage links to the blog without post previews on desktop, mobile, and w
       const page = await context.newPage();
       await page.goto(TEST_URL);
       const link = page.getByRole('link', { name: 'Read the blog', exact: true });
-      await expect(link).toHaveAttribute('href', '/recipes/blog/');
+      await expect(link).toHaveAttribute('href', `${SITE_BASE}blog/`);
       await expect(link).toBeInViewport();
-      await expect(page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true })).toHaveAttribute('href', '/recipes/blog/');
+      await expect(page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true })).toHaveAttribute('href', `${SITE_BASE}blog/`);
       await expect(page.locator('[data-blog-card]')).toHaveCount(0);
       await expect(page.getByRole('heading', { name: 'Latest from the kitchen', exact: true })).toHaveCount(0);
-      await expect(page.locator('a[href^="/recipes/blog/"]:not([href="/recipes/blog/"])')).toHaveCount(0);
+      await expect(page.locator(`a[href^="${SITE_BASE}blog/"]:not([href="${SITE_BASE}blog/"])`)).toHaveCount(0);
       await expect(page.locator('#recipe-list [data-recipe-card]')).toHaveCount(recipes.length);
       await link.click();
       await expect(page).toHaveURL(`${TEST_URL}blog/`);
@@ -80,7 +80,7 @@ test('blog navigation, chronology, and recipe references use only published post
   }
   await expect(page.locator('[data-blog-card]')).toHaveCount(0);
   await page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true }).click();
-  await expect(page).toHaveURL(/\/recipes\/blog\/$/);
+  await expect(page).toHaveURL(`${TEST_URL}blog/`);
   const links = page.locator('[data-blog-card] h2 a');
   await expect(links).toHaveCount(posts.length);
   expect(await links.allTextContents()).toEqual(posts.map(post => post.data.title));
@@ -88,8 +88,8 @@ test('blog navigation, chronology, and recipe references use only published post
   await expect(page.locator('[data-blog-page]')).toBeVisible();
   await expect(page.locator('time')).toHaveAttribute('datetime', '2026-09-17');
   await expect(page.getByRole('region', { name: 'Featured recipe' })).toContainText('Synthetic thirty-minute main');
-  await expect(page.getByRole('link', { name: 'Recipe directions' })).toHaveAttribute('href', '/recipes/test-build-thirty-minute-main/#directions');
-  await expect(page.getByRole('link', { name: 'Earlier note' })).toHaveAttribute('href', '/recipes/blog/test-build-earlier-note/');
+  await expect(page.getByRole('link', { name: 'Recipe directions' })).toHaveAttribute('href', `${SITE_BASE}test-build-thirty-minute-main/#directions`);
+  await expect(page.getByRole('link', { name: 'Earlier note' })).toHaveAttribute('href', `${SITE_BASE}blog/test-build-earlier-note/`);
   await expect(page.locator('.recipe-body')).toContainText('Future post');
   await expect(page.locator('.recipe-body')).toContainText('Future dish');
   await expect(page.getByRole('link', { name: 'Future post' })).toHaveCount(0);
@@ -151,18 +151,18 @@ test('real Pagefind ingredient search excludes source-library references', async
   await page.goto('./');
   await expect(page).toHaveTitle('The Everyday Table');
   await expect(page.locator(cards)).toHaveCount(recipes.length);
-  const indexed = page.waitForResponse(response => response.url().includes('/recipes/pagefind/') && response.ok());
+  const indexed = page.waitForResponse(response => response.url().includes(`${SITE_BASE}pagefind/`) && response.ok());
   await page.getByLabel('Search recipes & ingredients').fill(INGREDIENT_QUERY);
   await indexed;
   await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toHaveAttribute('data-url', '/recipes/test-build-thirty-minute-main/');
+  await expect(page.locator(cards)).toHaveAttribute('data-url', `${SITE_BASE}test-build-thirty-minute-main/`);
   await page.getByLabel('Search recipes & ingredients').fill(EXTERNAL_QUERY);
   await expect(page.getByRole('status')).toHaveText('0 recipes');
-  expect(await page.evaluate(async query => {
-    const moduleUrl = `${location.origin}/recipes/pagefind/pagefind.js`;
+  expect(await page.evaluate(async ({ query, base }) => {
+    const moduleUrl = `${location.origin}${base}pagefind/pagefind.js`;
     const index = await import(moduleUrl);
     return (await index.search(query)).results.length;
-  }, EXTERNAL_QUERY)).toBe(0);
+  }, { query: EXTERNAL_QUERY, base: SITE_BASE })).toBe(0);
   expect(failures).toEqual([]);
 });
 
@@ -171,16 +171,16 @@ test('known-time filters exclude null/over-threshold values and combine with oth
   await page.getByLabel('Known total time').selectOption('30');
   await expect(page.locator(cards)).toHaveCount(knownQuick.length);
   for (const slug of ['test-build-variable-soup', 'test-build-long-main']) {
-    await expect(page.locator(`[data-url="/recipes/${slug}/"]`)).toBeHidden();
+    await expect(page.locator(`[data-url="${SITE_BASE}${slug}/"]`)).toBeHidden();
   }
   for (const slug of ['test-build-zero-cook-side', 'test-build-thirty-minute-main']) {
-    await expect(page.locator(`[data-url="/recipes/${slug}/"]`)).toBeVisible();
+    await expect(page.locator(`[data-url="${SITE_BASE}${slug}/"]`)).toBeVisible();
   }
   await page.getByLabel('Cuisine', { exact: true }).selectOption('Fixture Japanese');
   await page.getByLabel('Category', { exact: true }).selectOption('Fixture Main');
   await page.getByLabel('Main ingredient').selectOption('Carrot');
   await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toHaveAttribute('data-url', '/recipes/test-build-thirty-minute-main/');
+  await expect(page.locator(cards)).toHaveAttribute('data-url', `${SITE_BASE}test-build-thirty-minute-main/`);
   await page.getByRole('button', { name: 'Clear filters' }).click();
   await expect(page.locator(cards)).toHaveCount(recipes.length);
   await page.getByLabel('Category', { exact: true }).selectOption('Fixture Soup');
@@ -246,7 +246,7 @@ test('draft recipes and source references never expose routes, links or searchab
 test('source library credits originals and links to published adaptations without copying methods', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('navigation').getByRole('link', { name: 'Source library' }).click();
-  await expect(page).toHaveURL(/\/recipes\/sources\/$/);
+  await expect(page).toHaveURL(`${TEST_URL}sources/`);
   await expect(page.getByRole('heading', { name: 'Source library', exact: true })).toBeVisible();
   await expect(page.getByText('These are external references', { exact: false })).toBeVisible();
   await expect(page.getByText('Publishers control availability and may require sign-in or a subscription.', { exact: false })).toBeVisible();
@@ -339,7 +339,7 @@ test('every public page has the correct canonical, social metadata and working s
       [...new Set(elements.map(element => element.getAttribute('href') ?? element.getAttribute('src')!))]);
     for (const link of links) {
       expect(link.startsWith(SITE_BASE)).toBe(true);
-      expect(link.includes('/recipes/recipes/')).toBe(false);
+      expect(link.startsWith('/recipes/')).toBe(false);
       if (checked.has(link)) continue;
       expect((await request.get(link)).status(), link).toBe(200);
       checked.add(link);
@@ -359,8 +359,8 @@ test('sitemap and robots include only real public pages, and 404 stays noindex',
   }
   const robots = await request.get('robots.txt');
   expect(robots.status()).toBe(200);
-  expect(await robots.text()).toContain('Sitemap: https://ebmarquez.github.io/recipes/sitemap.xml');
-  expect(await robots.text()).toContain('Allow: /recipes/');
+  expect(await robots.text()).toContain(`Sitemap: ${canonicalUrl(`${SITE_BASE}sitemap.xml`)}`);
+  expect(await robots.text()).toContain(`Allow: ${SITE_BASE}`);
   expect((await page.goto('not-a-real-recipe/'))?.status()).toBe(404);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, follow');
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
