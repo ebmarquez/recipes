@@ -1,8 +1,6 @@
 import { matchesFilters } from '../lib/publication.ts';
+import { searchPaths } from '../lib/search.ts';
 
-interface Pagefind {
-  search(query: string): Promise<{ results: { data(): Promise<{ url: string }> }[] }>;
-}
 const form = document.querySelector<HTMLFormElement>('#recipe-filters')!;
 const search = document.querySelector<HTMLInputElement>('#recipe-search')!;
 const cuisine = document.querySelector<HTMLSelectElement>('#cuisine')!;
@@ -17,7 +15,6 @@ const cards = [...document.querySelectorAll<HTMLElement>('[data-recipe-card]')].
   data: JSON.parse(element.dataset.filter!) as Parameters<typeof matchesFilters>[0],
   url: element.dataset.url!,
 }));
-let pagefind: Pagefind | undefined;
 let revision = 0;
 let timer: ReturnType<typeof setTimeout>;
 
@@ -34,11 +31,7 @@ async function update() {
   if (query) {
     status.textContent = 'Searching recipes…';
     try {
-      const modulePath = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/pagefind/pagefind.js`;
-      pagefind ??= await import(/* @vite-ignore */ modulePath);
-      const result = await pagefind!.search(query);
-      const data = await Promise.all(result.results.map(item => item.data()));
-      matched = new Set(data.map(item => new URL(item.url, location.origin).pathname));
+      matched = await searchPaths(query);
     } catch (error) {
       if (current !== revision) return;
       console.error('Recipe search failed', error);

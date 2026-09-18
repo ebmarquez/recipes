@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { recentRecipes, recipeHref } from '../lib/publication.ts';
+import { publishedPosts, blogHref } from '../lib/blog.ts';
+const base = import.meta.env.BASE_URL;
+const items = [
+  ...publishedPosts(await getCollection('blog')).map(({ data }) => ({ ...data, kind: 'Blog', href: blogHref(data.slug, base) })),
+  ...recentRecipes(await getCollection('recipes')).map(({ data }) => ({ ...data, kind: 'Recipe', href: recipeHref(data.slug, base) })),
+];
+---
+<SiteLayout title="Search" description="Search published recipes and kitchen blog posts.">
+  <section class="source-library wrapper">
+    <h1>Search the table</h1>
+    <form id="site-search-form" class="filters" role="search" aria-label="Search the site" hidden>
+      <label for="site-search">Search recipes and blog posts</label>
+      <input id="site-search" type="search" name="q" autocomplete="off" aria-describedby="site-search-help" />
+      <p id="site-search-help" class="field-help">Search full recipes and blog posts. Ingredient and time filters are on Browse recipes.</p>
+      <button class="text-button" type="reset">Clear search</button>
+    </form>
+    <p id="site-search-fallback" class="notice">All published recipes and posts are listed below. Full-text search needs JavaScript.</p>
+    <p id="site-search-status" role="status" aria-live="polite">{items.length} results</p>
+    <p id="site-search-error" class="notice" role="alert" hidden></p>
+    <ul class="recipe-grid">
+      {items.map(item => <li class="recipe-card" data-search-card data-url={item.href}>
+        <article>
+          <p class="eyebrow">{item.kind}</p>
+          <h2 class="search-result-title"><a href={item.href}>{item.title}</a></h2>
+          <p>{item.description}</p>
+        </article>
+      </li>)}
+    </ul>
+    <p id="site-search-empty" class="notice" hidden>No recipes or posts match. Try another word or clear your search.</p>
+  </section>
+  <script>
+    import '../scripts/site-search.ts';
+  </script>
+</SiteLayout>

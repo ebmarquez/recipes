@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
+import { publishedPosts } from '../../lib/blog.ts';
+export async function getStaticPaths() {
+  return publishedPosts(await getCollection('blog')).map(post => ({
+    params: { slug: post.data.slug }, props: { post },
+  }));
+}
+interface Props { post: CollectionEntry<'blog'> }
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+const featured = data.featured_recipe
+  ? (await getCollection('recipes')).find(recipe => recipe.data.slug === data.featured_recipe) : undefined;
+if (data.featured_recipe && !featured) throw new Error(`blog/${data.slug}: featured_recipe is not available`);
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<SiteLayout title={data.title} description={data.description}>
+  <article class="recipe wrapper" data-pagefind-body data-blog-page>
+    <a class="back-link" href={`${home}blog/`} data-pagefind-ignore>&larr; All blog posts</a>
+    <header>
+      <p class="eyebrow" data-pagefind-meta="kind">Blog</p>
+      <h1 data-pagefind-meta="title">{data.title}</h1>
+      <p class="recipe-description" data-pagefind-meta="description">{data.description}</p>
+      {data.date_published && <p class="entry-date" data-pagefind-ignore>Published <time datetime={data.date_published}>{data.date_published}</time></p>}
+    </header>
+    <div class="recipe-body"><Content /></div>
+    {featured && <section class="recipe-end" aria-label="Featured recipe" data-pagefind-ignore>
+      <h2>Featured recipe</h2>
+      <ul class="recipe-grid featured-recipes"><RecipeCard recipe={featured.data} /></ul>
+    </section>}
+  </article>
+</SiteLayout>

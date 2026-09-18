@@ -49,6 +49,7 @@ test('public URLs, sitemap and robots respect the project base and exclude draft
   assert.throws(() => canonicalUrl('/recipes/?q=carrot'), /query/);
   assert.deepEqual(pages.map(page => page.url), [
     `${SITE_ORIGIN}${SITE_BASE}`, `${SITE_ORIGIN}${SITE_BASE}sources/`,
+    `${SITE_ORIGIN}${SITE_BASE}blog/`, `${SITE_ORIGIN}${SITE_BASE}search/`,
     `${SITE_ORIGIN}${SITE_BASE}${recipes[0].data.slug}/`,
   ]);
   const xml = renderSitemap(pages);
@@ -56,7 +57,7 @@ test('public URLs, sitemap and robots respect the project base and exclude draft
   assert.ok(!xml.includes('404'));
   assert.ok(xml.includes('<lastmod>2026-09-14</lastmod>'));
   assert.ok(robotsText().includes(`Sitemap: ${SITE_ORIGIN}${SITE_BASE}sitemap.xml`));
-  for (const slug of ['sources', 'robots', 'sitemap']) {
+  for (const slug of ['sources', 'robots', 'sitemap', 'blog', 'search']) {
     assert.throws(() => validateRecipes([entry({ slug })]), /slug/);
   }
 });

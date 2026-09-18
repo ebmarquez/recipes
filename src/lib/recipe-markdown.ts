@@ -9,10 +9,13 @@ import type { Root, RootContent, Heading, ListItem, Text, Link } from 'mdast';
 import type { Node } from 'unist';
 import { isSafeExternalUrl } from './recipe-contract.ts';
 import type { RecipeEntry } from './recipe-contract.ts';
-import { publishedRecipes, recipeHref } from './publication.ts';
+import { isPublished, recipeHref } from './publication.ts';
 
 const parser = unified().use(remarkParse).use(remarkGfm);
 type TreeNode = Node & { children?: TreeNode[] };
+export type MarkdownEntry = Pick<RecipeEntry, 'filename' | 'body'> & {
+  data: Pick<RecipeEntry['data'], 'slug' | 'publication_status'>;
+};
 
 function walk(node: TreeNode, action: (node: TreeNode) => void) {
   action(node);
@@ -40,14 +43,18 @@ function setHeadings(tree: Root): Set<string> {
   return ids;
 }
 
-function resolveLink(url: string, entry: RecipeEntry, entries: RecipeEntry[]): { target?: RecipeEntry; fragment: string } {
+function resolveLink(url: string, entry: MarkdownEntry, entries: RecipeEntry[], posts?: MarkdownEntry[]): { target?: MarkdownEntry; fragment: string; blog?: boolean } {
   const fail = (detail: string): never => { throw new Error(`${entry.filename}: invalid link URL "${url}": ${detail}`); };
   if (isSafeExternalUrl(url)) return { fragment: '' };
-  const local = url.match(/^(?:\.\.\/([a-z0-9]+(?:-[a-z0-9]+)*)\/)?(#[^?#/\\\s]+)?$/);
-  if (!local || !url) return fail('use HTTPS, a local #heading, or ../recipe-slug/');
-  const target = local[1] ? entries.find(item => item.data.slug === local[1]) : entry;
-  if (!target) return fail('unknown recipe slug (check for a typo)');
-  const fragment = local[2] ?? '';
+  const local = url.match(/^(?:(\.\.\/(?:\.\.\/)?)([a-z0-9]+(?:-[a-z0-9]+)*)\/)?(#[^?#/\\\s]+)?$/);
+  if (!local || !url || (!posts && local[1] === '../../')) {
+    return fail(posts ? 'use HTTPS, #heading, ../post-slug/, or ../../recipe-slug/' : 'use HTTPS, a local #heading, or ../recipe-slug/');
+  }
+  const blog = !!posts && local[1] !== '../../';
+  const targets = blog ? posts! : entries;
+  const target = local[2] ? targets.find(item => item.data.slug === local[2]) : entry;
+  if (!target) return fail(`unknown ${blog ? 'blog' : 'recipe'} slug (check for a typo)`);
+  const fragment = local[3] ?? '';
   if (fragment) {
     let heading: string;
     try {
@@ -57,10 +64,10 @@ function resolveLink(url: string, entry: RecipeEntry, entries: RecipeEntry[]): {
     }
     if (!setHeadings(parser.parse(target.body)).has(heading)) return fail('unknown heading fragment');
   }
-  return { target, fragment };
+  return { target, fragment, blog };
 }
 
-function prepareTree(entry: RecipeEntry, entries: RecipeEntry[]): Root {
+function prepareTree(entry: MarkdownEntry, entries: RecipeEntry[], posts?: MarkdownEntry[]): Root {
   const tree = parser.parse(entry.body);
   const definitions = new Map<string, string>();
   walk(tree, node => {
@@ -68,13 +75,13 @@ function prepareTree(entry: RecipeEntry, entries: RecipeEntry[]): Root {
       const definition = node as Extract<RootContent, { type: 'definition' }>;
       if (definitions.has(definition.identifier)) throw new Error(`${entry.filename}: duplicate link definition "${definition.identifier}"`);
       definitions.set(definition.identifier, definition.url);
-      resolveLink(definition.url, entry, entries);
+      resolveLink(definition.url, entry, entries, posts);
     }
     if (node.type === 'html') throw new Error(`${entry.filename}: raw HTML is not allowed; use Markdown`);
     if (node.type === 'heading') {
       const heading = node as Heading;
       if (heading.depth === 1) throw new Error(`${entry.filename}: use level-two headings; the page provides the title`);
-      if (['ingredients', 'directions'].includes(sectionName(heading)) && heading.depth !== 2) throw new Error(`${entry.filename}: Ingredients and Instructions/Directions must use level-two headings`);
+      if (!posts && ['ingredients', 'directions'].includes(sectionName(heading)) && heading.depth !== 2) throw new Error(`${entry.filename}: Ingredients and Instructions/Directions must use level-two headings`);
     }
     if (node.type === 'image' || node.type === 'imageReference') throw new Error(`${entry.filename}: images require a reviewed image contract; omit images in this pilot`);
     if (node.type === 'text' && /\[\[.*?\]\]/.test((node as Text).value)) throw new Error(`${entry.filename}: wikilinks are not supported`);
@@ -86,7 +93,7 @@ function prepareTree(entry: RecipeEntry, entries: RecipeEntry[]): Root {
       if (!url) throw new Error(`${entry.filename}: unresolved link reference "${reference.identifier}"`);
       Object.assign(node, { type: 'link', url });
     }
-    if (node.type === 'link') resolveLink((node as Link).url, entry, entries);
+    if (node.type === 'link') resolveLink((node as Link).url, entry, entries, posts);
   });
   setHeadings(tree);
   return tree;
@@ -125,8 +132,20 @@ export function validateMarkdown(entry: RecipeEntry, entries: RecipeEntry[]): vo
 }
 
 export async function renderRecipe(entry: RecipeEntry, entries: RecipeEntry[], base: string): Promise<{ html: string }> {
-  const tree = prepareTree(entry, entries);
-  const published = new Set(publishedRecipes(entries).map(item => item.data.slug));
+  return renderMarkdown(entry, entries, base);
+}
+
+export function validateBlogMarkdown(entry: MarkdownEntry, entries: RecipeEntry[], posts: MarkdownEntry[]): void {
+  if (!entry.body.trim()) throw new Error(`${entry.filename}: blog body must not be empty`);
+  prepareTree(entry, entries, posts);
+}
+
+export async function renderBlog(entry: MarkdownEntry, entries: RecipeEntry[], posts: MarkdownEntry[], base: string): Promise<{ html: string }> {
+  return renderMarkdown(entry, entries, base, posts);
+}
+
+async function renderMarkdown(entry: MarkdownEntry, entries: RecipeEntry[], base: string, posts?: MarkdownEntry[]): Promise<{ html: string }> {
+  const tree = prepareTree(entry, entries, posts);
   function rewrite(parent: TreeNode) {
     if (!parent.children) return;
     parent.children = parent.children.flatMap(node => {
@@ -134,11 +153,11 @@ export async function renderRecipe(entry: RecipeEntry, entries: RecipeEntry[], b
       if (node.type === 'definition') return [];
       if (node.type !== 'link') return [node];
       const link = node as Extract<RootContent, { type: 'link' }>;
-      const { target, fragment } = resolveLink(link.url, entry, entries);
+      const { target, fragment, blog } = resolveLink(link.url, entry, entries, posts);
       if (!target) return [node];
-      if (!published.has(target.data.slug)) return node.children ?? [];
-      link.url = target.data.slug === entry.data.slug && fragment
-        ? fragment : `${recipeHref(target.data.slug, base)}${fragment}`;
+      if (!isPublished(target.data)) return node.children ?? [];
+      link.url = target === entry && fragment
+        ? fragment : `${recipeHref(`${blog ? 'blog/' : ''}${target.data.slug}`, base)}${fragment}`;
       return [node];
     });
   }
@@ -146,6 +165,10 @@ export async function renderRecipe(entry: RecipeEntry, entries: RecipeEntry[], b
   walk(tree, node => {
     if (node.type === 'listItem') (node as ListItem).checked = null;
   });
+  if (posts) {
+    const processor = unified().use(remarkRehype).use(rehypeStringify);
+    return { html: processor.stringify(await processor.run(tree)) };
+  }
   let section = '';
   let ingredient = 0;
   const headingIds = setHeadings(tree);

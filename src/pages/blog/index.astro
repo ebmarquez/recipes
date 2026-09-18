@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { publishedPosts } from '../../lib/blog.ts';
+const posts = publishedPosts(await getCollection('blog'));
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<SiteLayout title="From the kitchen" description="Dinner ideas, cooking notes, and the recipes behind them.">
+  <section class="source-library wrapper" aria-labelledby="blog-heading">
+    <p class="eyebrow">The Everyday Table blog</p>
+    <h1 id="blog-heading">From the kitchen</h1>
+    <p class="recipe-description">What is on the table, with links to the recipes behind it.</p>
+    <p><a href={`${home}search/`}>Search recipes and blog posts</a></p>
+    {posts.length ? <ul class="recipe-grid">{posts.map(({ data }) => <BlogCard post={data} heading="h2" />)}</ul>
+      : <p class="notice">The kitchen blog is waiting for its first approved post.</p>}
+  </section>
+</SiteLayout>

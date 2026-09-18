@@ -3,15 +3,86 @@ import { readRecipes } from '../src/lib/read-recipes.ts';
 import { readSources, publishedSources } from '../src/lib/sources.ts';
 import { publishedRecipes } from '../src/lib/publication.ts';
 import { canonicalUrl, publicPages, SITE_BASE } from '../src/lib/site.ts';
-import { publishedFixtures, sourceFixtures, HIDDEN_RECIPE, INGREDIENT_QUERY, EXTERNAL_QUERY, TEST_URL } from './build-fixtures.ts';
+import { readBlog, publishedPosts } from '../src/lib/blog.ts';
+import { publishedFixtures, sourceFixtures, blogFixtures, HIDDEN_BLOG, BLOG_QUERY, HIDDEN_RECIPE, INGREDIENT_QUERY, EXTERNAL_QUERY, TEST_URL } from './build-fixtures.ts';
 
 const originals = publishedRecipes(await readRecipes());
 const recipes = [...originals, ...publishedFixtures];
 const sources = publishedSources([...await readSources(), ...sourceFixtures]);
+const posts = publishedPosts([...await readBlog(), ...blogFixtures]);
 const cards = '[data-recipe-card]:visible';
 const recipePaths = recipes.map(({ data }) => `${data.slug}/`);
-const allPaths = ['./', 'sources/', ...recipePaths];
+const allPaths = ['./', 'sources/', 'blog/', 'search/', ...recipePaths, ...posts.map(post => `blog/${post.data.slug}/`)];
 const knownQuick = recipes.filter(({ data }) => data.total_minutes !== null && data.total_minutes <= 30);
+
+test('blog navigation, chronology, recipe references and homepage previews use only published posts', async ({ page, request }) => {
+  await page.goto('./');
+  await expect(page.locator('[data-blog-card]')).toHaveCount(Math.min(posts.length, 3));
+  await page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true }).click();
+  await expect(page).toHaveURL(/\/recipes\/blog\/$/);
+  const links = page.locator('[data-blog-card] h2 a');
+  await expect(links).toHaveCount(posts.length);
+  expect(await links.allTextContents()).toEqual(posts.map(post => post.data.title));
+  await page.getByRole('link', { name: 'Synthetic kitchen note', exact: true }).click();
+  await expect(page.locator('[data-blog-page]')).toBeVisible();
+  await expect(page.locator('time')).toHaveAttribute('datetime', '2026-09-17');
+  await expect(page.getByRole('region', { name: 'Featured recipe' })).toContainText('Synthetic thirty-minute main');
+  await expect(page.getByRole('link', { name: 'Recipe directions' })).toHaveAttribute('href', '/recipes/test-build-thirty-minute-main/#directions');
+  await expect(page.getByRole('link', { name: 'Earlier note' })).toHaveAttribute('href', '/recipes/blog/test-build-earlier-note/');
+  await expect(page.locator('.recipe-body')).toContainText('Future post');
+  await expect(page.locator('.recipe-body')).toContainText('Future dish');
+  await expect(page.getByRole('link', { name: 'Future post' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Future dish' })).toHaveCount(0);
+  expect(await page.content()).not.toContain(HIDDEN_BLOG);
+  expect(await page.content()).not.toContain(HIDDEN_RECIPE);
+  await expect(page.getByRole('checkbox')).toHaveCount(0);
+  expect((await request.get(`blog/${HIDDEN_BLOG}/`)).status()).toBe(404);
+  await page.getByRole('link', { name: 'Earlier note' }).click();
+  await expect(page.getByRole('region', { name: 'Featured recipe' })).toHaveCount(0);
+});
+
+test('site-wide Pagefind search finds blog body and recipe ingredients without changing recipe filters', async ({ page }) => {
+  await page.goto(`search/?q=${BLOG_QUERY}`);
+  await expect(page.getByRole('status')).toHaveText('1 result');
+  await expect(page.locator('[data-search-card]:visible')).toContainText('Synthetic kitchen note');
+  await page.reload();
+  await expect(page.getByLabel('Search recipes and blog posts', { exact: true })).toHaveValue(BLOG_QUERY);
+  await expect(page.getByRole('status')).toHaveText('1 result');
+  await page.getByLabel('Search recipes and blog posts', { exact: true }).fill(INGREDIENT_QUERY);
+  await expect(page.getByRole('status')).toHaveText('2 results');
+  for (const query of ['DRAFTBLOGBODYSENTINEL', 'DRAFTBLOGTITLESENTINEL', EXTERNAL_QUERY]) {
+    await page.getByLabel('Search recipes and blog posts', { exact: true }).fill(query);
+    await expect(page.getByRole('status')).toHaveText('0 results');
+  }
+  await page.getByRole('button', { name: 'Clear search' }).click();
+  await expect(page.locator('[data-search-card]:visible')).toHaveCount(recipes.length + posts.length);
+  await page.goto(`./?q=${BLOG_QUERY}`);
+  await expect(page.getByRole('status')).toHaveText('0 recipes');
+});
+
+test('site search failures show an explicit fallback and blog reading works without JavaScript', async ({ page, browser }) => {
+  await page.route('**/pagefind/**', route => route.abort());
+  await page.goto('search/');
+  await page.getByLabel('Search recipes and blog posts', { exact: true }).fill(BLOG_QUERY);
+  await expect(page.getByRole('alert')).toContainText('Search is unavailable');
+  await expect(page.getByRole('status')).toContainText('search unavailable');
+  await expect(page.locator('[data-search-card]:visible')).toHaveCount(recipes.length + posts.length);
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const reading = await context.newPage();
+    await reading.goto(`${TEST_URL}blog/`);
+    await reading.getByRole('link', { name: 'Synthetic kitchen note', exact: true }).click();
+    await expect(reading.getByRole('heading', { name: 'Synthetic kitchen note', exact: true })).toBeVisible();
+    await reading.getByRole('link', { name: 'Recipe directions' }).click();
+    await expect(reading.locator('#directions')).toBeVisible();
+    await reading.goto(`${TEST_URL}search/`);
+    await expect(reading.locator('#site-search-fallback')).toBeVisible();
+    await expect(reading.getByRole('search')).toBeHidden();
+    await expect(reading.locator('[data-search-card]:visible')).toHaveCount(recipes.length + posts.length);
+  } finally {
+    await context.close();
+  }
+});
 
 test('real Pagefind ingredient search excludes source-library references', async ({ page }) => {
   const failures: string[] = [];
@@ -221,7 +292,7 @@ test('sitemap and robots include only real public pages, and 404 stays noindex',
   expect(sitemap.headers()['content-type']).toContain('xml');
   const xml = await sitemap.text();
   const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
-  expect(locations).toEqual(publicPages(recipes).map(item => item.url));
+  expect(locations).toEqual(publicPages(recipes, posts).map(item => item.url));
   for (const forbidden of ['404', HIDDEN_RECIPE, 'test-build-hidden-source', 'test-build-public-source']) {
     expect(xml).not.toContain(forbidden);
   }
