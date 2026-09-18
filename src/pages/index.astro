@@ -2,12 +2,9 @@
 import { getCollection } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import RecipeCard from '../components/RecipeCard.astro';
-import BlogCard from '../components/BlogCard.astro';
-import { publishedPosts } from '../lib/blog.ts';
 import { recentRecipes } from '../lib/publication.ts';
 import { COLLECTION_NOTE } from '../lib/site.ts';
 const recipes = recentRecipes(await getCollection('recipes'));
-const posts = publishedPosts(await getCollection('blog')).slice(0, 3);
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
   [...new Set(recipes.flatMap(recipe => recipe.data[key]))].sort((a, b) => a.localeCompare(b));
@@ -23,13 +20,6 @@ const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
       <a class="button button-outline" href={`${home}blog/`}>Read the blog</a>
     </div>
   </section>
-  {posts.length > 0 && <section class="browse wrapper" aria-labelledby="latest-blog-heading">
-    <div class="section-heading">
-      <h2 id="latest-blog-heading">Latest from the kitchen</h2>
-      <a href={`${home}blog/`}>All blog posts</a>
-    </div>
-    <ul class="recipe-grid">{posts.map(({ data }) => <BlogCard post={data} />)}</ul>
-  </section>}
   <section id="browse" class="browse wrapper" aria-labelledby="browse-heading">
     <div class="section-heading">
       <div><p class="eyebrow">From the recipe box</p><h2 id="browse-heading">Recently added</h2></div>

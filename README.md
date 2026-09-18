@@ -83,9 +83,9 @@ printing remain available.
 ## Kitchen blog and authoring agents
 
 The **Blog** navigation and the home page's **Read the blog** button open
-`/recipes/blog/`. Published posts appear newest first, link to an optional
-featured recipe, and appear above the recipe browser in the home page's latest
-posts section. Only owner-approved posts appear on the public site.
+`/recipes/blog/`. Published posts appear newest first on the blog index and
+link to an optional featured recipe. The home page stays focused on recipes,
+without blog post previews. Only owner-approved posts appear on the public site.
 
 Start a public-safe draft in `content\blog` using
 [`docs\blog-template.md`](docs/blog-template.md). The strict metadata and link

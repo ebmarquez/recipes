@@ -48,7 +48,7 @@ test('published photos load with alt text, captions and credit while draft and u
   }
 });
 
-test('homepage exposes the blog before the recipe list on desktop, mobile, and without JavaScript', async ({ browser }) => {
+test('homepage links to the blog without post previews on desktop, mobile, and without JavaScript', async ({ browser }) => {
   for (const [width, javaScriptEnabled] of [[1280, true], [390, true], [390, false]] as const) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, javaScriptEnabled });
     try {
@@ -57,9 +57,11 @@ test('homepage exposes the blog before the recipe list on desktop, mobile, and w
       const link = page.getByRole('link', { name: 'Read the blog', exact: true });
       await expect(link).toHaveAttribute('href', '/recipes/blog/');
       await expect(link).toBeInViewport();
-      const blogTop = await page.locator('[aria-labelledby="latest-blog-heading"]').evaluate(element => element.getBoundingClientRect().top);
-      const recipesTop = await page.locator('#browse').evaluate(element => element.getBoundingClientRect().top);
-      expect(blogTop).toBeLessThan(recipesTop);
+      await expect(page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true })).toHaveAttribute('href', '/recipes/blog/');
+      await expect(page.locator('[data-blog-card]')).toHaveCount(0);
+      await expect(page.getByRole('heading', { name: 'Latest from the kitchen', exact: true })).toHaveCount(0);
+      await expect(page.locator('a[href^="/recipes/blog/"]:not([href="/recipes/blog/"])')).toHaveCount(0);
+      await expect(page.locator('#recipe-list [data-recipe-card]')).toHaveCount(recipes.length);
       await link.click();
       await expect(page).toHaveURL(`${TEST_URL}blog/`);
       await page.getByRole('link', { name: 'Synthetic kitchen note', exact: true }).click();
@@ -70,13 +72,13 @@ test('homepage exposes the blog before the recipe list on desktop, mobile, and w
   }
 });
 
-test('blog navigation, chronology, recipe references and homepage previews use only published posts', async ({ page, request }) => {
+test('blog navigation, chronology, and recipe references use only published posts', async ({ page, request }) => {
   await page.goto('./');
   await expect(page.getByRole('link', { name: 'Local drafts', exact: true })).toHaveCount(0);
   for (const path of ['local-drafts/', `local-drafts/blog/${HIDDEN_BLOG}/`, `local-drafts/photos/${HIDDEN_PHOTO}`]) {
     expect((await request.get(path)).status()).toBe(404);
   }
-  await expect(page.locator('[data-blog-card]')).toHaveCount(Math.min(posts.length, 3));
+  await expect(page.locator('[data-blog-card]')).toHaveCount(0);
   await page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true }).click();
   await expect(page).toHaveURL(/\/recipes\/blog\/$/);
   const links = page.locator('[data-blog-card] h2 a');

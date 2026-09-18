@@ -66,7 +66,8 @@ export async function verifyOutput(directory = join(process.cwd(), 'dist')): Pro
   if (!posts.length) assert.ok(blogHtml.includes('waiting for its first approved post'), 'Empty blog must explain its empty state');
   const homeHtml = await readFile(join(directory, 'index.html'), 'utf8');
   assert.equal((homeHtml.match(/\bdata-recipe-card\b/g) ?? []).length, recipes.length, 'Blog cards must not affect recipe counts');
-  assert.equal((homeHtml.match(/\bdata-blog-card\b/g) ?? []).length, Math.min(posts.length, 3), 'Homepage must show only the latest three posts');
+  assert.equal((homeHtml.match(/\bdata-blog-card\b/g) ?? []).length, 0, 'Homepage must link to the blog without displaying post previews');
+  assert.ok(homeHtml.includes(`href="${SITE_BASE}blog/"`), 'Homepage must retain a link to the blog');
   const searchHtml = await readFile(join(directory, 'search', 'index.html'), 'utf8');
   assert.equal((searchHtml.match(/\bdata-search-card\b/g) ?? []).length, recipes.length + posts.length, 'Site search must list published recipes and posts');
   assert.ok(!blogHtml.includes('data-pagefind-body') && !searchHtml.includes('data-pagefind-body'), 'Listing pages must not enter Pagefind');

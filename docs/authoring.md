@@ -276,9 +276,10 @@ The featured-recipe card uses the existing recipe's title, description, and
 timing, rather than separate blog copies. Recipe Markdown keeps its existing
 `../recipe-slug/` link contract.
 
-Published posts appear newest publication date first (slug breaks date ties),
-on the blog index and in the home page's latest-post section. They enter the
-Pagefind index and sitemap. `/recipes/search/` searches both recipes and posts;
+Published posts appear newest publication date first (slug breaks date ties)
+on the blog index. The home page links to the blog without displaying post
+previews. Posts enter the Pagefind index and sitemap.
+`/recipes/search/` searches both recipes and posts;
 the home page's ingredient/time filters and recipe counts remain recipe-only.
 External source cards remain outside Pagefind. Draft posts are validated but
 excluded before Astro's content store, production HTML, search, and sitemap
