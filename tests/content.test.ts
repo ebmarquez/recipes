@@ -37,7 +37,7 @@ test('source URL accepts normal HTTPS with optional published date', () => {
 });
 
 test('filenames, duplicate normalized titles and reserved/colliding slugs fail', () => {
-  for (const slug of ['index', 'pagefind', 'sitemap.xml', '404', 'recipes', 'search']) {
+  for (const slug of ['index', 'pagefind', 'sitemap.xml', '404', 'recipes', 'search', 'local-drafts']) {
     assert.throws(() => validateRecipes([entry({ slug })]), /slug/i);
   }
   assert.throws(() => validateRecipes([{ ...entry(), filename: 'other.md' }]), /filename/i);

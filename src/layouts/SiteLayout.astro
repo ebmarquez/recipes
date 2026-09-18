@@ -45,6 +45,7 @@ const canonical = noindex ? undefined : canonicalUrl(Astro.url.pathname);
           <a href={`${home}blog/`}>Blog</a>
           <a href={`${home}search/`}>Search</a>
           <a href={`${home}sources/`}>Source library</a>
+          {import.meta.env.DEV && <a href={`${home}local-drafts/`}>Local drafts</a>}
         </nav>
       </div>
     </header>

@@ -23,6 +23,11 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
   Do not invent source URLs, testing claims, quantities, or nutrition values.
 - Publishing approval grants no additional reuse license. Third-party rights
   remain with their owners; do not claim exclusive rights over AI-only output.
+- The owner confirms rights to photos they supply for the site. Accept that
+  confirmation without repeatedly asking for proof. Import them with
+  `npm run photo:add` to remove embedded metadata; never put originals in
+  `public`. Use optional `photos` metadata with alt text and credit on recipes
+  or blog posts. Photo rights confirmation does not authorize publication.
 
 ## Recipes
 

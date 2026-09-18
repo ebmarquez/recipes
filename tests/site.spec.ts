@@ -4,7 +4,7 @@ import { readSources, publishedSources } from '../src/lib/sources.ts';
 import { publishedRecipes } from '../src/lib/publication.ts';
 import { canonicalUrl, publicPages, SITE_BASE } from '../src/lib/site.ts';
 import { readBlog, publishedPosts } from '../src/lib/blog.ts';
-import { publishedFixtures, sourceFixtures, blogFixtures, HIDDEN_BLOG, BLOG_QUERY, HIDDEN_RECIPE, INGREDIENT_QUERY, EXTERNAL_QUERY, TEST_URL } from './build-fixtures.ts';
+import { publishedFixtures, sourceFixtures, blogFixtures, HIDDEN_BLOG, BLOG_QUERY, HIDDEN_RECIPE, INGREDIENT_QUERY, EXTERNAL_QUERY, TEST_URL, BLOG_PHOTO, RECIPE_PHOTO, HIDDEN_PHOTO, UNUSED_PHOTO } from './build-fixtures.ts';
 
 const originals = publishedRecipes(await readRecipes());
 const recipes = [...originals, ...publishedFixtures];
@@ -15,8 +15,45 @@ const recipePaths = recipes.map(({ data }) => `${data.slug}/`);
 const allPaths = ['./', 'sources/', 'blog/', 'search/', ...recipePaths, ...posts.map(post => `blog/${post.data.slug}/`)];
 const knownQuick = recipes.filter(({ data }) => data.total_minutes !== null && data.total_minutes <= 30);
 
+test('published photos load with alt text, captions and credit while draft and unused images return 404', async ({ page, request, browser }) => {
+  for (const [path, filename, alt] of [
+    ['blog/test-build-kitchen-note/', BLOG_PHOTO, 'Synthetic blog photo'],
+    ['test-build-variable-soup/', RECIPE_PHOTO, 'Synthetic recipe photo'],
+  ]) {
+    await page.goto(path);
+    const image = page.getByRole('img', { name: alt });
+    await image.scrollIntoViewIfNeeded();
+    await expect(image).toHaveAttribute('src', `/recipes/photos/${filename}`);
+    await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    await expect(page.locator('.photo-credit')).toHaveText('Synthetic image for testing.');
+    const response = await request.get(`photos/${filename}`);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('image/webp');
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  for (const name of [HIDDEN_PHOTO, UNUSED_PHOTO]) {
+    expect((await request.get(`photos/${name}`)).status()).toBe(404);
+  }
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const reading = await context.newPage();
+    await reading.goto(`${TEST_URL}blog/test-build-kitchen-note/`);
+    const image = reading.getByRole('img', { name: 'Synthetic blog photo' });
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    await expect(reading.locator('.photo-caption')).toHaveText('Photo caption fixture.');
+  } finally {
+    await context.close();
+  }
+});
+
 test('blog navigation, chronology, recipe references and homepage previews use only published posts', async ({ page, request }) => {
   await page.goto('./');
+  await expect(page.getByRole('link', { name: 'Local drafts', exact: true })).toHaveCount(0);
+  for (const path of ['local-drafts/', `local-drafts/blog/${HIDDEN_BLOG}/`, `local-drafts/photos/${HIDDEN_PHOTO}`]) {
+    expect((await request.get(path)).status()).toBe(404);
+  }
   await expect(page.locator('[data-blog-card]')).toHaveCount(Math.min(posts.length, 3));
   await page.getByRole('navigation').getByRole('link', { name: 'Blog', exact: true }).click();
   await expect(page).toHaveURL(/\/recipes\/blog\/$/);

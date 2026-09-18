@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { validateMarkdown } from './recipe-markdown.ts';
+import { text } from './content-fields.ts';
+import { photosSchema } from './photo-contract.ts';
 
-export const text = z.string().trim().min(1).refine(value => !/[<>\u0000-\u001f]/.test(value), 'Use plain text without HTML or control characters');
+export { text } from './content-fields.ts';
 export const slugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const textList = z.array(text);
 const minutes = z.number().nonnegative().nullable();
@@ -9,7 +11,7 @@ export const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
   const parsed = new Date(`${value}T00:00:00Z`);
   return Number.isFinite(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
 }, 'Use a real calendar date (YYYY-MM-DD)');
-const reserved = new Set(['index', '404', 'recipes', 'blog', 'search', 'sources', 'pagefind', 'sitemap', 'sitemap.xml', 'robots', 'robots.txt', 'assets', '_astro', 'favicon']);
+const reserved = new Set(['index', '404', 'recipes', 'blog', 'photos', 'search', 'sources', 'local-drafts', 'pagefind', 'sitemap', 'sitemap.xml', 'robots', 'robots.txt', 'assets', '_astro', 'favicon']);
 
 export function isSafeExternalUrl(value: string): boolean {
   if (/[\s\\\u0000-\u001f\u007f]/.test(value) || !/^https?:\/\//i.test(value)) return false;
@@ -27,6 +29,7 @@ const recipeMetadataSchema = z.object({
   type: z.literal('Recipe'),
   slug: slugSchema.refine(value => !reserved.has(value), 'Reserved route slug'),
   description: text,
+  photos: photosSchema.optional(),
   publication_status: z.enum(['draft', 'published']),
   cuisine: text,
   category: text,

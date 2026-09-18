@@ -47,10 +47,12 @@ The single schema in `src\lib\recipe-contract.ts` is used by Astro and Node test
 | `date_published` | Optional/null while drafting; owner-approved release date required for deployment |
 | `source_name` | Required for `published`; optional for `draft` until known; never invent provenance |
 | `source_url` | Optional or `null`; absolute HTTP(S) URL without credentials |
+| `photos` | Optional list of imported local photos with alt text and credit; see Adding photos |
 
 Unknown keys, duplicate YAML keys, invalid values, duplicate/colliding slugs, and
 inconsistent filenames fail validation. Reserved slugs include `index`, `404`,
-`recipes`, `blog`, `search`, `sources`, `pagefind`, `sitemap`, `robots`, `assets`, and `favicon`.
+`recipes`, `blog`, `photos`, `search`, `sources`, `local-drafts`, `pagefind`,
+`sitemap`, `robots`, `assets`, and `favicon`.
 Dates stay date-only strings; they are not converted into fabricated publication
 timestamps.
 
@@ -79,8 +81,8 @@ Nutrition values must remain clearly labeled estimates. Do not add unsupported
 values, ratings, fictitious credentials, or duplicate ingredient data for JSON-LD.
 The site intentionally emits no recipe JSON-LD.
 
-Raw HTML, wikilinks, and images are rejected by the current contract. A future image
-feature needs reviewed licensing, local assets, alt text, and credit support.
+Raw HTML, wikilinks, and inline Markdown images are rejected. Attach supported
+local photographs through the `photos` metadata described under Adding photos.
 
 ## Links and stable URLs
 
@@ -119,7 +121,7 @@ For an approved release, the owner sets the intended release date and confirms
 it after successful deployment. The September 14, 2026 launch uses `2026-09-14`.
 
 A new valid draft requires no site-code change. Drafts are validated but excluded
-before Astro stores content. They are not in routes, home-page data, filter choices,
+before Astro stores content. They are not in public routes, home-page data, filter choices,
 search, the sitemap, or downloadable static payloads. The public sitemap
 contains the home page, source library, blog index, site search, and published
 recipe and blog pages only.
@@ -195,6 +197,30 @@ Read the actual page at <http://127.0.0.1:4321/recipes/>. Verify ingredients,
 directions, yield, source credit, links, mobile layout, and browser print output.
 Use `npm run test:e2e` for automated Chromium checks. Search uses the built
 Pagefind index; `npm run dev` is for authoring and does not generate that index.
+To review a blog draft with its photos, stop the preview server and run:
+
+```powershell
+npm run dev -- --host 127.0.0.1 --port 4321
+```
+
+Choose **Local drafts** in the navigation, or open
+<http://127.0.0.1:4321/recipes/local-drafts/>.
+Draft pages use the same article and photo layout as published posts, with a
+clear draft banner. Refresh after editing a post. Featured recipes link only
+when published; draft targets remain plain text. Keep this authoring server
+bound to loopback, not a network/public host.
+
+Development routing accepts URLs with or without the final `/`. Draft pages
+redirect missing-slash links to the full URL, preserving query parameters;
+photo URLs keep their `.webp` filenames. Production still uses
+`trailingSlash: 'always'`.
+
+These development-only routes read validated Markdown directly, without
+putting drafts into Astro's content store. They and their photo endpoints
+generate no production files and are excluded from search and the sitemap.
+`npm run build` followed by `npm run preview` still shows published content
+only. Viewing a draft does not change its status or authorize publication.
+
 `npm run lint:docs` includes root `AGENTS.md` and `CLAUDE.md`, docs, and all
 `.github` authoring Markdown. Lint changed recipe files separately as well.
 
@@ -210,7 +236,8 @@ do not fabricate a first post or turn planned meals into claimed experiences.
 An empty collection displays an invitation to the first approved post.
 
 The strict schema in `src\lib\blog.ts` is shared by validation and Astro.
-Every field below is required; unknown fields and duplicate YAML keys fail.
+Every field below is required unless marked optional; unknown fields and
+duplicate YAML keys fail.
 
 | Field | Contract |
 | --- | --- |
@@ -220,9 +247,15 @@ Every field below is required; unknown fields and duplicate YAML keys fail.
 | `date_created`, `date_modified` | Actual authoring dates, valid `YYYY-MM-DD` strings |
 | `date_published` | Exactly null for drafts; owner-approved date required for published posts |
 | `featured_recipe` | An existing recipe slug, or null; published posts may feature only published recipes |
+| `photos` | Optional list of imported local photos with alt text and credit; see Adding photos |
 
-Posts have freeform Markdown bodies with level-two sections; ingredients and
-directions are not required. Raw HTML, images, and wikilinks remain unsupported.
+Posts have freeform Markdown bodies. Short dinner stories should flow in
+conversational paragraphs, without a heading before each paragraph. Preserve
+the owner's phrasing and avoid repeated summaries or formulaic explanations.
+Use level-two headings only when longer posts need sections; ingredients and
+directions are not required. This does not change recipe formatting.
+Raw HTML, inline Markdown images, and wikilinks
+remain unsupported; use `photos` metadata for photographs.
 Checklist prompts render as ordinary bullets, not recipe ingredient controls.
 The recipe remains the method's source of truth; use links rather than copied
 instructions. Blog claims must reflect the owner's account, not AI experience.
@@ -248,11 +281,11 @@ on the blog index and in the home page's latest-post section. They enter the
 Pagefind index and sitemap. `/recipes/search/` searches both recipes and posts;
 the home page's ingredient/time filters and recipe counts remain recipe-only.
 External source cards remain outside Pagefind. Draft posts are validated but
-excluded before Astro's content store, HTML, search, and sitemap generation.
+excluded before Astro's content store, production HTML, search, and sitemap
+generation. The loopback-only development workflow above can preview them.
 
 **Draft does not mean private.** Do not save private meal plans, schedules,
 family locations, medical details, journals, or rights-unclear material here.
-No actual cooking posts are supplied by the feature implementation.
 
 ### Supporting agents
 
@@ -263,6 +296,7 @@ Choose a repository agent in Copilot's agent picker:
 | Sous-Chef Chronicler | Turn owner-provided, public-safe cooking notes into original draft prose |
 | The Publisher's Editor | Review facts, provenance, privacy, links, and automated checks without publishing |
 | Meal-to-Post Planner | Propose meals conversationally; create only approved public-safe draft prompts |
+| Riley Cookbook Story Editor | Review the owner's voice, factual impressions, photo captions, and alt text |
 
 Example requests: "Draft a post about this recipe using these observations,"
 "Review this draft for publication readiness," or "Suggest three recipe-linked
@@ -279,3 +313,65 @@ Run that separate lint command when blog Markdown files exist. Browser tests
 use synthetic published and draft posts only in their isolated fixture copy.
 The output verifier expects exactly published recipe/post routes and Pagefind
 entries; neither source files nor fixture output are deployment artifacts.
+
+## Adding photos
+
+Photos are supported on both recipe and blog pages. The owner confirms they
+own the rights to the photographs they supply for this site. Accept that
+confirmation without repeatedly requesting proof; it does not authorize
+copying other people's images or automatically publishing a post.
+For any separately sourced photo, resolve permission and truthful credit first.
+
+Import an owner-supplied still JPEG, PNG, or WebP:
+
+```powershell
+npm run photo:add -- "C:\path\to\dinner.jpg" dinner.webp
+```
+
+The importer applies the original orientation, limits the longest edge to
+1600 pixels without enlarging smaller images, converts to WebP, and strips
+embedded metadata including EXIF/GPS, XMP, IPTC, and color profiles. It leaves
+the original untouched and refuses to overwrite an existing filename. Use
+a new stable filename for a replacement. Input limits are 40 MB and 40 million
+pixels; animated images and SVG are not supported.
+
+Only the sanitized copy goes into `content\photos`. Never copy the original
+into this repository, and never store authoring photos under `public`:
+Astro copies public assets even when the referencing post is a draft.
+
+Add this optional frontmatter field to the recipe or post:
+
+```yaml
+photos:
+  - src: dinner.webp
+    alt: Egg drop soup with egg ribbons and sliced green onions in a bowl.
+    credit: Photo by the site owner.
+    caption: Tonight's soup.
+```
+
+`src` is a filename, not a URL or path. Only lowercase ASCII words/numbers
+separated by hyphens and ending in `.webp` are allowed. `alt` and `credit`
+must be nonempty plain text; `caption` is optional but must be nonempty plain
+text when supplied. Unknown fields and duplicate photos within an entry fail.
+Use `photos: []` or omit the field when no photos are needed.
+
+The page displays photos in order, with responsive sizing, intrinsic
+dimensions, captions, and credit. They work without JavaScript and are excluded
+from full-text recipe indexing. The original recipe remains unchanged when
+you attach a dinner photo to a blog post.
+
+All referenced files, including draft references, are checked for existence,
+decodability, valid dimensions, and stripped metadata. Do not bypass the importer
+by renaming a JPEG or adding metadata back to a WebP.
+
+Only photos referenced by published recipes or posts receive a generated URL,
+normally `/recipes/photos/dinner.webp`. Draft-only and unreferenced photos
+are excluded entirely from the build, not merely hidden from the page.
+A photo shared with a published entry is public even if a draft also uses it.
+The release verifier checks the exact emitted photo list and file bytes.
+
+Draft status still does not make Git files private. Check visible photo
+content for private details before saving; metadata stripping cannot remove
+information visible in the picture. Image rights confirmation and approval
+of draft wording remain separate from an instruction to publish, commit,
+push, or deploy.

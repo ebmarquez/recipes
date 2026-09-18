@@ -1,0 +1,21 @@
+---
+import { photoHref, type Photo } from '../lib/photo-contract.ts';
+import { readPhoto } from '../lib/photos.ts';
+interface Props { photos?: Photo[]; draftPreview?: boolean }
+const { photos = [], draftPreview = false } = Astro.props;
+if (draftPreview && !import.meta.env.DEV) throw new Error('Draft photo previews are development-only');
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${draftPreview ? 'local-drafts/' : ''}`;
+const images = await Promise.all(photos.map(async photo => ({
+  ...photo, ...await readPhoto(photo.src),
+})));
+---
+{images.length > 0 && <div class="photo-gallery" data-pagefind-ignore>
+  {images.map(photo => <figure>
+    <img src={photoHref(photo.src, base)} alt={photo.alt}
+      width={photo.width} height={photo.height} loading="lazy" decoding="async" />
+    <figcaption>
+      {photo.caption && <span class="photo-caption">{photo.caption}</span>}
+      <span class="photo-credit">{photo.credit}</span>
+    </figcaption>
+  </figure>)}
+</div>}

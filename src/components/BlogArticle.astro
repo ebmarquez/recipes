@@ -1,0 +1,29 @@
+---
+import type { BlogPost } from '../lib/blog.ts';
+import type { Recipe } from '../lib/recipe-contract.ts';
+import RecipeCard from './RecipeCard.astro';
+import PhotoGallery from './PhotoGallery.astro';
+interface Props { post: BlogPost; featured?: Recipe; draftPreview?: boolean }
+const { post, featured, draftPreview = false } = Astro.props;
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<article class="recipe wrapper" data-pagefind-body={draftPreview ? undefined : true} data-blog-page>
+  <a class="back-link" href={`${home}${draftPreview ? 'local-drafts/' : 'blog/'}`} data-pagefind-ignore>
+    &larr; {draftPreview ? 'All local drafts' : 'All blog posts'}
+  </a>
+  {draftPreview && <p class="notice" role="note">Local draft preview. This post is not published. Previewing it does not publish any photos.</p>}
+  <header>
+    <p class="eyebrow" data-pagefind-meta="kind">{draftPreview ? 'Draft' : 'Blog'}</p>
+    <h1 data-pagefind-meta="title">{post.title}</h1>
+    <p class="recipe-description" data-pagefind-meta="description">{post.description}</p>
+    {post.date_published && <p class="entry-date" data-pagefind-ignore>Published <time datetime={post.date_published}>{post.date_published}</time></p>}
+    {draftPreview && <p class="entry-date">Draft updated <time datetime={post.date_modified}>{post.date_modified}</time></p>}
+  </header>
+  <PhotoGallery photos={post.photos} draftPreview={draftPreview} />
+  <div class="recipe-body"><slot /></div>
+  {featured && <section class="recipe-end" aria-label="Featured recipe" data-pagefind-ignore>
+    <h2>Featured recipe</h2>
+    <ul class="recipe-grid featured-recipes"><RecipeCard recipe={featured} /></ul>
+  </section>}
+  {draftPreview && post.featured_recipe && !featured && <p class="notice">The featured recipe is also a draft; its public link is not available.</p>}
+</article>

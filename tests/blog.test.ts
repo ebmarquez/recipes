@@ -84,6 +84,17 @@ test('blog and recipe slugs can coincide without confusing link namespaces or he
   assert.ok(html.includes('href="/blog/other/#notes"'));
 });
 
+test('draft rendering retains local heading anchors without revealing other draft URLs', async () => {
+  const posts = validateBlog([
+    post({ publication_status: 'draft', date_published: null }, '## Notes\n\n[Here](#notes)\n\n[Other draft](../other/)\n'),
+    post({ slug: 'other', title: 'Other draft', publication_status: 'draft', date_published: null }),
+  ], [recipe]);
+  const { html } = await renderBlog(posts[0], [recipe], posts, '/recipes/');
+  assert.ok(html.includes('href="#notes"'));
+  assert.ok(html.includes('Other draft'));
+  assert.ok(!html.includes('/other/'));
+});
+
 test('published posts sort by publication date then slug and sitemap excludes drafts', () => {
   const posts = validateBlog([
     post({ slug: 'older', title: 'Older', date_published: '2026-09-16' }),
@@ -127,7 +138,7 @@ test('blog file reader and actual authoring template enforce draft defaults and 
 });
 
 test('blog authoring agents have valid profiles without implicit publishing tools or model overrides', async () => {
-  for (const name of ['sous-chef-chronicler', 'publishers-editor', 'meal-to-post-planner']) {
+  for (const name of ['sous-chef-chronicler', 'publishers-editor', 'meal-to-post-planner', 'riley-cookbook-story-editor']) {
     const path = join(process.cwd(), '.github', 'agents', `${name}.agent.md`);
     const raw = await readFile(path, 'utf8');
     const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);

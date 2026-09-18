@@ -7,6 +7,7 @@ import { publishedRecipes } from './publication.ts';
 import { canonicalUrl, publicPages, renderSitemap, robotsText, SITE_BASE } from './site.ts';
 import { generatedFiles, decodedOutput } from './output-files.ts';
 import { readBlog, publishedPosts } from './blog.ts';
+import { publishedPhotoNames, readPhoto } from './photos.ts';
 
 export async function verifyOutput(directory = join(process.cwd(), 'dist')): Promise<void> {
   assert.ok(!process.env.COOKBOOK_TEST_CONTENT_DIR, 'Refusing to verify a test-fixture deployment');
@@ -15,6 +16,8 @@ export async function verifyOutput(directory = join(process.cwd(), 'dist')): Pro
   const sources = publishedSources(await readSources());
   const allPosts = await readBlog(undefined, allRecipes);
   const posts = publishedPosts(allPosts);
+  const expectedPhotos = new Set(publishedPhotoNames([...allRecipes, ...allPosts]).map(filename => `photos/${filename}`));
+  const actualPhotos = new Set<string>();
   const expectedHtml = new Set(['index.html', '404.html', 'sources/index.html', 'blog/index.html', 'search/index.html',
     ...recipes.map(({ data }) => `${data.slug}/index.html`),
     ...posts.map(({ data }) => `blog/${data.slug}/index.html`)]);
@@ -22,7 +25,15 @@ export async function verifyOutput(directory = join(process.cwd(), 'dist')): Pro
   let indexedPages = 0;
   for (const file of await generatedFiles(directory)) {
     const name = relative(directory, file).split(sep).join('/');
+    if (/\.(?:webp|png|jpe?g|gif|avif|tiff?)$/i.test(name)) {
+      assert.ok(expectedPhotos.has(name), `${name}: unapproved or draft photo in deployment output`);
+      actualPhotos.add(name);
+      const filename = name.slice('photos/'.length);
+      const [source, output] = await Promise.all([readPhoto(filename), readPhoto(filename, directory)]);
+      assert.deepEqual(output.bytes, source.bytes, `${name}: output differs from the validated, metadata-free photo`);
+    }
     const content = await decodedOutput(file);
+    assert.ok(!name.startsWith('local-drafts/') && !content.includes('/local-drafts/'), `${name}: local draft preview leaked into deployment output`);
     if (name.endsWith('.pf_fragment')) indexedPages++;
     assert.ok(!name.includes('test-build-') && !content.includes('test-build-'), `${name}: test fixture remains`);
     assert.ok(!/DRAFT(?:RECIPE|SOURCE|BLOG)\w*SENTINEL/.test(content), `${name}: draft sentinel remains`);
@@ -38,6 +49,7 @@ export async function verifyOutput(directory = join(process.cwd(), 'dist')): Pro
     assert.ok(!content.includes('content="noindex'), `${name}: public page is noindex`);
   }
   assert.deepEqual(actualHtml, expectedHtml, 'Generated pages differ from the published collection');
+  assert.deepEqual(actualPhotos, expectedPhotos, 'Generated photos differ from published entry references');
   assert.equal(indexedPages, recipes.length + posts.length, 'Pagefind must contain exactly the published recipes and blog posts');
   for (const { data } of recipes) {
     assert.ok(data.date_published, `${data.slug}: owner-approved release date_published is required before deployment`);
