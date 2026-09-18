@@ -6,7 +6,11 @@ This is a public personal collection of recipes the owner has made or wants to
 make. Sources are credited and linked where known; inclusion does not mean
 every recipe has been tested.
 
-**Site address:** <https://ebmarquez.github.io/recipes/>
+**Configured site address:** <https://kitchen.familymarquez.com/>
+
+Domain setup and rollback use the coordinated
+[custom-domain cutover](#custom-domain-cutover) below. The previous address is
+<https://ebmarquez.github.io/recipes/>.
 
 ## Public publishing workflow
 
@@ -56,14 +60,14 @@ npm run build
 npm run preview
 ```
 
-Open **<http://127.0.0.1:4321/recipes/>**. Local servers bind only to loopback;
+Open **<http://127.0.0.1:4321/>**. Local servers bind only to loopback;
 stop them with Ctrl+C. A local build or preview does not deploy anything.
 Canonicals and sitemap URLs intentionally use the public Pages address even
 when previewed locally.
 
 | Script | Purpose |
 | --- | --- |
-| `npm run dev` | Local authoring at `/recipes/`, with change watching and development-only blog draft previews |
+| `npm run dev` | Local authoring at `/`, with change watching and development-only blog draft previews |
 | `npm run test:content` | Contract, link, source, publication, workflow, and template tests; validate current content |
 | `npm run check` | Astro and TypeScript diagnostics |
 | `npm run lint:docs` | Lint README, both root agent guides, docs, and all `.github` Markdown |
@@ -83,7 +87,7 @@ printing remain available.
 ## Kitchen blog and authoring agents
 
 The **Blog** navigation and the home page's **Read the blog** button open
-`/recipes/blog/`. Published posts appear newest first on the blog index and
+`/blog/`. Published posts appear newest first on the blog index and
 link to an optional featured recipe. The home page stays focused on recipes,
 without blog post previews. Only owner-approved posts appear on the public site.
 
@@ -94,7 +98,7 @@ Drafts use `date_published: null` and are excluded from generated output, but
 draft source files in this public repository are **not private**.
 
 To review a draft with its photos, run `npm run dev` and choose **Local drafts**
-in the navigation at `/recipes/local-drafts/`. These routes exist only in the
+in the navigation at `/local-drafts/`. These routes exist only in the
 loopback development server; builds and `npm run preview` remain published-only.
 See [Preview and verify](docs/authoring.md#preview-and-verify) for the workflow.
 
@@ -190,6 +194,59 @@ run. Recipe and blog authoring tools must not automatically push or publish.
 After deployment, verify the live home page, blog, recipe and site search,
 source library, and sitemap at the site address above.
 
+### Custom-domain cutover
+
+The target is `kitchen.familymarquez.com`, served at `/` rather than
+`/recipes/`. `src\lib\site.ts` supplies the origin and base to Astro,
+canonicals, sitemap, robots, and the tests. Recipe and blog slugs do not change.
+Do not merge the domain branch or change the live Pages custom domain until
+the owner is ready to make the DNS change. Saving a custom domain can redirect
+the old address before the new hostname resolves; deployment, DNS propagation,
+and certificate provisioning can cause a temporary interruption.
+
+1. In the owner's [account Pages settings](https://github.com/settings/pages),
+   choose **Add a domain** and enter `familymarquez.com`. This verifies the
+   parent domain and protects its immediate subdomains, including `kitchen`.
+2. Add the exact TXT name and value GitHub supplies to the existing DNS host.
+   Return to GitHub and select **Verify** after the record resolves. Retain
+   the TXT record afterward. Do not commit the zone export or verification
+   token to this repository.
+3. At the agreed cutover, open
+   [repository Pages settings](https://github.com/ebmarquez/recipes/settings/pages).
+   Keep **Source: GitHub Actions**, set **Custom domain** to
+   `kitchen.familymarquez.com`, and save it **before** adding the routing record.
+4. Add only this DNS record at the existing provider:
+
+   | Type | Name | Target | TTL |
+   | --- | --- | --- | --- |
+   | CNAME | `kitchen` | `ebmarquez.github.io` | 1800 |
+
+   The target has no scheme or repository path. Do not replace the zone,
+   change nameservers, create wildcard records, or alter existing `www`,
+   mail, identity, SPF, DKIM, or DMARC records.
+5. Merge the verified domain PR and wait for the Pages deployment for that
+   exact merge commit. A root-hosted build must not deploy while the
+   repository is still configured solely for its old `/recipes/` address.
+6. Confirm GitHub's DNS check succeeds and **Enforce HTTPS** is enabled once
+   the certificate is available. DNS propagation and HTTPS availability can
+   each take up to 24 hours.
+7. Verify the homepage, blog, recipes, photos, both searches, sitemap,
+   and robots at the new domain. Check old GitHub Pages homepage and deep
+   links redirect to their matching new paths.
+
+This repository publishes through a custom Actions workflow. GitHub's
+instructions say a repository `CNAME` file is ignored and not required in
+this mode; the domain is configured in Pages settings. No workflow changes
+or additional hosting service are needed.
+
+If the cutover must be rolled back, coordinate removal of the custom routing
+record and Pages domain with restoration of the previous origin/base and
+its verified build. Do not leave a dangling DNS record pointing to GitHub.
+
+Official instructions:
+[domain verification](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages)
+and [custom-domain configuration](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
+
 ## Architecture and public URLs
 
 | Path | Responsibility |
@@ -214,18 +271,17 @@ source library, and sitemap at the site address above.
 | `.github\agents` | Cooking, blog drafting, editorial review, and topic planning agents |
 | `src\lib\verify-output.ts` | Final real-content artifact verification |
 
-Canonical recipe paths are `/recipes/<slug>/`, never
-`/recipes/recipes/<slug>/`. Recently added recipes use publication dates when
+Canonical recipe paths are `/<slug>/`, without the old `/recipes/` prefix.
+Recently added recipes use publication dates when
 present, then modified/created dates with a stable title tie-break.
-Blog paths are `/recipes/blog/<slug>/`, with newest publication dates first
+Blog paths are `/blog/<slug>/`, with newest publication dates first
 and slug tie-breaks. The sitemap contains the home, source library, blog index,
 site search, and published recipe/post pages. Drafts, individual source-card
 targets, fixtures in release output, and 404 are excluded. No feed is generated.
 
-`/recipes/robots.txt` points to `/recipes/sitemap.xml`. Crawlers discover
-robots policy at the origin root, so this project-scoped file does **not**
-replace or control `https://ebmarquez.github.io/robots.txt`. The cookbook does
-not modify the account site's configuration. The 404 page remains `noindex`;
+`/robots.txt` points to `https://kitchen.familymarquez.com/sitemap.xml`.
+The robots policy is at the custom origin root. The cookbook does not modify
+the separate account site's configuration. The 404 page remains `noindex`;
 other public pages have canonical and Open Graph text metadata without
 invented images.
 

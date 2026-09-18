@@ -19,6 +19,15 @@ const source = {
   publication_status: 'published',
 };
 
+test('custom domain hosts the cookbook at the origin root', () => {
+  assert.equal(SITE_ORIGIN, 'https://kitchen.familymarquez.com');
+  assert.equal(SITE_BASE, '/');
+  const pages = publicPages([entry()]);
+  assert.equal(pages[0].url, 'https://kitchen.familymarquez.com/');
+  assert.ok(pages.every(page => !new URL(page.url).pathname.startsWith('/recipes/')));
+  assert.equal(robotsText(), 'User-agent: *\nAllow: /\n\nSitemap: https://kitchen.familymarquez.com/sitemap.xml\n');
+});
+
 test('source contract is strict, link-only and uses the shared URL safety rules', () => {
   assert.ok(sourceSchema.safeParse(source).success);
   for (const invalid of [
@@ -39,14 +48,15 @@ test('source slugs are unique and drafts never enter the public selection', () =
   assert.deepEqual(publishedSources(items).map(item => item.slug), ['reference-card']);
 });
 
-test('public URLs, sitemap and robots respect the project base and exclude draft/404 routes', () => {
+test('public URLs, sitemap and robots respect the configured origin/base and exclude draft/404 routes', () => {
   const recipes = [entry(), entry({ slug: 'hidden-recipe', title: 'Hidden', publication_status: 'draft' })];
   const pages = publicPages(recipes);
-  assert.equal(canonicalUrl('/recipes/'), `${SITE_ORIGIN}/recipes/`);
-  assert.equal(canonicalUrl('/recipes/sources/'), `${SITE_ORIGIN}/recipes/sources/`);
-  assert.throws(() => canonicalUrl('//example.com/recipes/'), /site/);
-  assert.throws(() => canonicalUrl('/outside/'), /base/);
-  assert.throws(() => canonicalUrl('/recipes/?q=carrot'), /query/);
+  assert.equal(canonicalUrl(SITE_BASE), `${SITE_ORIGIN}${SITE_BASE}`);
+  assert.equal(canonicalUrl(`${SITE_BASE}sources/`), `${SITE_ORIGIN}${SITE_BASE}sources/`);
+  assert.throws(() => canonicalUrl('//example.com/'), /site/);
+  assert.throws(() => canonicalUrl('http://kitchen.familymarquez.com/'), /site/);
+  assert.throws(() => canonicalUrl(`${SITE_BASE}?q=carrot`), /query/);
+  assert.throws(() => canonicalUrl(`${SITE_BASE}#ingredients`), /fragment/);
   assert.deepEqual(pages.map(page => page.url), [
     `${SITE_ORIGIN}${SITE_BASE}`, `${SITE_ORIGIN}${SITE_BASE}sources/`,
     `${SITE_ORIGIN}${SITE_BASE}blog/`, `${SITE_ORIGIN}${SITE_BASE}search/`,

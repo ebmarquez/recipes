@@ -2,8 +2,8 @@ import type { Recipe } from './recipe-contract.ts';
 import { publishedRecipes, recipeHref } from './publication.ts';
 import { publishedPosts, blogHref, type BlogPost } from './blog.ts';
 
-export const SITE_ORIGIN = 'https://ebmarquez.github.io';
-export const SITE_BASE = '/recipes/';
+export const SITE_ORIGIN = 'https://kitchen.familymarquez.com';
+export const SITE_BASE = '/';
 export const COLLECTION_NOTE = 'A personal collection of recipes I have made or want to make. Sources are credited and linked where known; not every recipe has been tested.';
 
 export function canonicalUrl(pathname: string): string {

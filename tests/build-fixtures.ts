@@ -1,9 +1,10 @@
 import { entry } from './fixtures.ts';
 import type { Source } from '../src/lib/sources.ts';
 import type { BlogEntry } from '../src/lib/blog.ts';
+import { SITE_BASE } from '../src/lib/site.ts';
 
 export const TEST_ORIGIN = 'http://127.0.0.1:4332';
-export const TEST_URL = `${TEST_ORIGIN}/recipes/`;
+export const TEST_URL = `${TEST_ORIGIN}${SITE_BASE}`;
 export const HIDDEN_RECIPE = 'test-build-hidden-recipe';
 export const INGREDIENT_QUERY = 'Searchonlyparsley';
 export const EXTERNAL_QUERY = 'Qzxexternalreference';
