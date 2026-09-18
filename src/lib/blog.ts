@@ -6,11 +6,14 @@ import { readMarkdown } from './read-markdown.ts';
 import { readRecipes } from './read-recipes.ts';
 import { contentDirectory } from './content-directory.ts';
 import { isPublished, recipeHref } from './publication.ts';
+import { photosSchema } from './photo-contract.ts';
+import { validatePhotos } from './photos.ts';
 
 const metadata = z.object({
   title: text,
   slug: slugSchema.refine(value => value !== 'index', 'Reserved blog route slug'),
   description: text,
+  photos: photosSchema.optional(),
   date_created: date,
   date_modified: date,
   featured_recipe: slugSchema.nullable(),
@@ -54,7 +57,9 @@ export function validateBlog(input: { filename: string; data: unknown; body: str
 }
 
 export async function readBlog(directory = contentDirectory(), recipes?: RecipeEntry[]) {
-  return validateBlog(await readMarkdown(join(directory, 'blog')), recipes ?? await readRecipes(join(directory, 'recipes')));
+  const posts = validateBlog(await readMarkdown(join(directory, 'blog')), recipes ?? await readRecipes(join(directory, 'recipes')));
+  await validatePhotos(posts.map(post => ({ ...post, filename: `blog/${post.filename}` })), directory);
+  return posts;
 }
 
 export function publishedPosts<T extends { data: BlogPost }>(posts: T[]): T[] {

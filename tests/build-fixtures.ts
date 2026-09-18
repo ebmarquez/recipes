@@ -9,6 +9,10 @@ export const INGREDIENT_QUERY = 'Searchonlyparsley';
 export const EXTERNAL_QUERY = 'Qzxexternalreference';
 export const BLOG_QUERY = 'Qzxkitchennarrative';
 export const HIDDEN_BLOG = 'test-build-hidden-blog';
+export const BLOG_PHOTO = 'test-build-blog-photo.webp';
+export const RECIPE_PHOTO = 'test-build-recipe-photo.webp';
+export const HIDDEN_PHOTO = 'test-build-hidden-photo.webp';
+export const UNUSED_PHOTO = 'test-build-unused-photo.webp';
 
 const body = `## Ingredients
 
@@ -30,6 +34,7 @@ export const publishedFixtures = [
     slug: 'test-build-variable-soup', title: 'Synthetic variable-time soup',
     category: 'Fixture Soup', cuisine: 'Fixture Italian',
     date_published: '2026-09-14',
+    photos: [{ src: RECIPE_PHOTO, alt: 'Synthetic recipe photo', credit: 'Synthetic image for testing.' }],
   }, `${body}\n[Future recipe](../${HIDDEN_RECIPE}/)`),
   entry({
     slug: 'test-build-thirty-minute-main', title: 'Synthetic thirty-minute main',
@@ -91,6 +96,7 @@ export const draftSentinels = [
   'test-build-hidden-source', 'DRAFTSOURCETITLESENTINEL', 'DRAFTSOURCEDESCRIPTIONSENTINEL',
   'DRAFTSOURCECREATORSENTINEL', 'DRAFTSOURCECUISINESENTINEL',
   HIDDEN_BLOG, 'DRAFTBLOGTITLESENTINEL', 'DRAFTBLOGDESCRIPTIONSENTINEL', 'DRAFTBLOGBODYSENTINEL',
+  HIDDEN_PHOTO, UNUSED_PHOTO, 'DRAFTPHOTOALTSENTINEL',
 ];
 
 export const blogFixtures: BlogEntry[] = [
@@ -101,6 +107,7 @@ export const blogFixtures: BlogEntry[] = [
       description: 'Synthetic dinner prose for browser tests, not an actual meal.',
       publication_status: 'published', date_created: '2026-09-17', date_modified: '2026-09-17',
       date_published: '2026-09-17', featured_recipe: 'test-build-thirty-minute-main',
+      photos: [{ src: BLOG_PHOTO, alt: 'Synthetic blog photo', credit: 'Synthetic image for testing.', caption: 'Photo caption fixture.' }],
     },
     body: `## Kitchen notes
 

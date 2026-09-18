@@ -7,6 +7,7 @@ date_created: 2026-09-17
 date_modified: 2026-09-17
 date_published: null
 featured_recipe: null
+photos: []
 ---
 
 ## On the menu

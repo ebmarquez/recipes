@@ -12,6 +12,7 @@ const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
     <h1 id="blog-heading">From the kitchen</h1>
     <p class="recipe-description">What is on the table, with links to the recipes behind it.</p>
     <p><a href={`${home}search/`}>Search recipes and blog posts</a></p>
+    {import.meta.env.DEV && <p class="notice">Looking for an unpublished post? <a href={`${home}local-drafts/`}>Review local blog drafts</a>.</p>}
     {posts.length ? <ul class="recipe-grid">{posts.map(({ data }) => <BlogCard post={data} heading="h2" />)}</ul>
       : <p class="notice">The kitchen blog is waiting for its first approved post.</p>}
   </section>

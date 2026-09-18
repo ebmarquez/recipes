@@ -30,7 +30,11 @@ contract in `src\lib\blog.ts` before authoring.
    and modification dates to actual authoring dates. Refer to
    `src\lib\blog.ts` as the metadata source of truth.
 5. Link recipes using `../../recipe-slug/` and other posts using
-   `../post-slug/`. Do not duplicate whole recipes. Omit images and raw HTML.
+   `../post-slug/`. Do not duplicate whole recipes or use raw HTML.
+   Import owner-supplied photos with `photo:add` and attach them through the
+   optional `photos` metadata, including alt text and credit. The owner has
+   confirmed rights to photos they supply; do not repeatedly ask for proof.
+   Do not put originals in `public` or use inline Markdown images.
 6. Run the authoring checks documented in `docs\authoring.md`, including
    linting the changed blog Markdown. Report file/field errors explicitly.
 
@@ -49,3 +53,5 @@ any source use against the repository's provenance rules.
 Never publish, change publication status to published, set a release date,
 commit, push, enable deployment, or schedule automation. Hand the draft to
 The Publisher's Editor for checks and to the owner for publication review.
+Riley Cookbook Story Editor can help polish the owner's voice or review
+captions without changing approved facts.

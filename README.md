@@ -15,7 +15,8 @@ editorially reviewed recipes whose rights they confirmed, including uncredited
 recipes. Full recipe pages may also contain independently written adaptations
 based on factual ingredient quantities and cooking procedures, with honest
 source credit and a public source link when known. Protected article prose,
-distinctive recipe wording, quotations, and photos are not copied.
+distinctive recipe wording, quotations, and photos are not copied without
+appropriate rights. The owner confirms rights to the photos they supply.
 The source library links to original creators and to hosted adaptations when
 available; an attribution is not a claim of testing or endorsement.
 
@@ -62,12 +63,13 @@ when previewed locally.
 
 | Script | Purpose |
 | --- | --- |
-| `npm run dev` | Local authoring at `/recipes/`, with recipe change watching |
+| `npm run dev` | Local authoring at `/recipes/`, with change watching and development-only blog draft previews |
 | `npm run test:content` | Contract, link, source, publication, workflow, and template tests; validate current content |
 | `npm run check` | Astro and TypeScript diagnostics |
 | `npm run lint:docs` | Lint README, both root agent guides, docs, and all `.github` Markdown |
 | `npm run build` | Validate content, generate static HTML/crawler files, and build Pagefind |
 | `npm run preview` | Serve `dist` locally with working search |
+| `npm run photo:add -- "path\to\photo.jpg" dinner.webp` | Import an orientation-corrected, metadata-free WebP without publishing |
 | `npm run test:e2e` | Browser tests against an isolated fixture build, followed by a real-content rebuild |
 | `npm run verify:output` | Verify the clean deployment output against the current published collection |
 
@@ -80,9 +82,10 @@ printing remain available.
 
 ## Kitchen blog and authoring agents
 
-The **Blog** navigation opens `/recipes/blog/`. Published posts appear newest
-first, link to an optional featured recipe, and appear in the home page's latest
-posts section. The blog starts empty; no cooking experiences are fabricated.
+The **Blog** navigation and the home page's **Read the blog** button open
+`/recipes/blog/`. Published posts appear newest first, link to an optional
+featured recipe, and appear above the recipe browser in the home page's latest
+posts section. Only owner-approved posts appear on the public site.
 
 Start a public-safe draft in `content\blog` using
 [`docs\blog-template.md`](docs/blog-template.md). The strict metadata and link
@@ -90,12 +93,32 @@ contract is documented in [Kitchen blog authoring](docs/authoring.md#kitchen-blo
 Drafts use `date_published: null` and are excluded from generated output, but
 draft source files in this public repository are **not private**.
 
-Three repository agents support the workflow: **Meal-to-Post Planner** proposes
+To review a draft with its photos, run `npm run dev` and choose **Local drafts**
+in the navigation at `/recipes/local-drafts/`. These routes exist only in the
+loopback development server; builds and `npm run preview` remain published-only.
+See [Preview and verify](docs/authoring.md#preview-and-verify) for the workflow.
+
+Four repository agents support the workflow: **Meal-to-Post Planner** proposes
 topics and approved public-safe prompts, **Sous-Chef Chronicler** drafts prose
 from the owner's observations, and **The Publisher's Editor** reviews facts,
-links, privacy, and release checks. Select them in Copilot's agent picker.
+links, privacy, and release checks. **Riley Cookbook Story Editor** helps with
+voice, factual storytelling, captions, and alt text. Select them in Copilot's
+agent picker.
 None publishes, commits, pushes, or schedules deployments. Personal meal plans
 and private schedules stay out of repository files.
+
+### Photos on recipes and posts
+
+Import your photo with `npm run photo:add`, then attach it through the optional
+`photos` frontmatter list with a local filename, alt text, credit, and an optional
+caption. See [Adding photos](docs/authoring.md#adding-photos) for the full example.
+Your supplied photos count as your confirmation of rights, not an instruction
+to publish. The importer strips embedded metadata and leaves the original alone.
+
+Photos live under `content\photos`, not `public`. Only photos referenced by
+published entries are generated; draft-only photos remain out of the public
+build. Like draft Markdown, photos committed to this public repository are
+still publicly readable in Git.
 
 ## Validation and fixture isolation
 
@@ -122,7 +145,8 @@ It never edits `content\recipes`, `content\blog`, or `content\sources.json`.
 Synthetic cases cover unknown,
 zero, exact-30, and over-30-minute timing, cuisine/category variety, numbered step
 headings, template-derived recipe/blog drafts, unpublished source references,
-blog chronology, featured recipes, and cross-content search.
+blog chronology, featured recipes, cross-content search, and published versus
+draft/unreferenced photo assets.
 The tests derive real recipe/blog/source counts from the collections, not a pilot list.
 
 Only test builds receive the internal `COOKBOOK_TEST_CONTENT_DIR` override.
@@ -172,9 +196,11 @@ source library, and sitemap at the site address above.
 | --- | --- |
 | `content\recipes\*.md` | Approved recipe metadata and Markdown body |
 | `content\blog\*.md` | Public-safe kitchen posts; new entries remain drafts |
+| `content\photos\*.webp` | Imported metadata-free photos; only published references are emitted |
 | `content\sources.json` | External reference cards; no recipe instructions or nutrition |
 | `src\lib\recipe-contract.ts` | Shared runtime recipe schema and URL/text rules |
 | `src\lib\blog.ts` | Strict blog schema, featured-recipe validation, reading and ordering |
+| `src\lib\photo-contract.ts`, `src\lib\photos.ts` | Photo metadata, import, file checks, and published-only selection |
 | `src\lib\sources.ts` | Strict source schema, validation, and published-only listing |
 | `src\lib\publication.ts` | Central publication predicate, recipe selection, ordering, URLs, filters |
 | `src\lib\site.ts` | Public origin/base, canonical URLs, sitemap and robots serialization |
@@ -183,6 +209,8 @@ source library, and sitemap at the site address above.
 | `src\pages\sources.astro` | Clearly labeled external source library |
 | `src\pages\blog` | Blog index and published post routes |
 | `src\pages\search.astro` | Site-wide recipe and blog search |
+| `src\pages\photos\[filename].webp.ts` | Static photo endpoints selected from published entries |
+| `src\preview` | Blog draft and photo routes injected only into the development server |
 | `.github\agents` | Cooking, blog drafting, editorial review, and topic planning agents |
 | `src\lib\verify-output.ts` | Final real-content artifact verification |
 

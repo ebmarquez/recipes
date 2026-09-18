@@ -28,6 +28,9 @@ Do not edit content or publication metadata as part of a validation pass.
 4. Check public suitability: no private schedules, journals, family locations,
    work context, medical details, credentials, or copied protected prose.
    Draft source files in this public repository are not private.
+   For photos, check alt text, credit, local imported files, metadata removal,
+   and exclusion of draft-only assets. Accept the owner's supplied photos as
+   their rights confirmation; rights confirmation does not approve publication.
 5. Run `npm run test:content`, `npm run check`, `npm run lint:docs`, and
    lint changed posts with the installed Markdown linter. Then run
    `npm run build`, `npm run test:e2e`, and `npm run verify:output`.

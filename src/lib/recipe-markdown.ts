@@ -83,7 +83,7 @@ function prepareTree(entry: MarkdownEntry, entries: RecipeEntry[], posts?: Markd
       if (heading.depth === 1) throw new Error(`${entry.filename}: use level-two headings; the page provides the title`);
       if (!posts && ['ingredients', 'directions'].includes(sectionName(heading)) && heading.depth !== 2) throw new Error(`${entry.filename}: Ingredients and Instructions/Directions must use level-two headings`);
     }
-    if (node.type === 'image' || node.type === 'imageReference') throw new Error(`${entry.filename}: images require a reviewed image contract; omit images in this pilot`);
+    if (node.type === 'image' || node.type === 'imageReference') throw new Error(`${entry.filename}: inline images are not supported; import a local photo and use the photos metadata`);
     if (node.type === 'text' && /\[\[.*?\]\]/.test((node as Text).value)) throw new Error(`${entry.filename}: wikilinks are not supported`);
   });
   walk(tree, node => {
@@ -155,7 +155,7 @@ async function renderMarkdown(entry: MarkdownEntry, entries: RecipeEntry[], base
       const link = node as Extract<RootContent, { type: 'link' }>;
       const { target, fragment, blog } = resolveLink(link.url, entry, entries, posts);
       if (!target) return [node];
-      if (!isPublished(target.data)) return node.children ?? [];
+      if (!isPublished(target.data) && !(target === entry && fragment)) return node.children ?? [];
       link.url = target === entry && fragment
         ? fragment : `${recipeHref(`${blog ? 'blog/' : ''}${target.data.slug}`, base)}${fragment}`;
       return [node];
