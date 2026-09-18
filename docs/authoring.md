@@ -50,7 +50,7 @@ The single schema in `src\lib\recipe-contract.ts` is used by Astro and Node test
 
 Unknown keys, duplicate YAML keys, invalid values, duplicate/colliding slugs, and
 inconsistent filenames fail validation. Reserved slugs include `index`, `404`,
-`recipes`, `search`, `sources`, `pagefind`, `sitemap`, `robots`, `assets`, and `favicon`.
+`recipes`, `blog`, `search`, `sources`, `pagefind`, `sitemap`, `robots`, `assets`, and `favicon`.
 Dates stay date-only strings; they are not converted into fabricated publication
 timestamps.
 
@@ -121,7 +121,8 @@ it after successful deployment. The September 14, 2026 launch uses `2026-09-14`.
 A new valid draft requires no site-code change. Drafts are validated but excluded
 before Astro stores content. They are not in routes, home-page data, filter choices,
 search, the sitemap, or downloadable static payloads. The public sitemap
-contains the home page, source library, and published recipe pages only.
+contains the home page, source library, blog index, site search, and published
+recipe and blog pages only.
 No feed is emitted.
 Contract tests read the actual parent-owned template; the browser build uses a
 template-derived draft to verify that it remains outside generated output.
@@ -167,6 +168,9 @@ local link or copy protected wording to fill the gap.
 
 ## Owner-approved release
 
+Blog authoring follows the same owner-review boundary. Building blog support
+does not approve any particular post, planned meal, or release date.
+
 Authoring a recipe does not commit, push, merge, or deploy it. After reviewing
 the changes and setting publication metadata, the owner integrates the release.
 Pushing approved changes to `main` runs the Pages workflow; manual dispatch is
@@ -196,3 +200,82 @@ Pagefind index; `npm run dev` is for authoring and does not generate that index.
 
 Only the owner may approve future releases, licensing, deployment configuration,
 and visibility changes. Public hosting approval is not a new reuse license.
+
+## Kitchen blog
+
+Store public-safe posts in `content\blog\<stable-slug>.md`, starting from
+`docs\blog-template.md`. Replace the sample title, slug, description, dates,
+and checklist prompts with owner-supplied material. New posts remain drafts;
+do not fabricate a first post or turn planned meals into claimed experiences.
+An empty collection displays an invitation to the first approved post.
+
+The strict schema in `src\lib\blog.ts` is shared by validation and Astro.
+Every field below is required; unknown fields and duplicate YAML keys fail.
+
+| Field | Contract |
+| --- | --- |
+| `title`, `description` | Nonempty plain text; title unique after case/spacing normalization |
+| `slug` | Stable lowercase ASCII words/numbers separated by hyphens; matches filename; not `index` |
+| `publication_status` | `draft` or `published`; no automatic scheduled publication |
+| `date_created`, `date_modified` | Actual authoring dates, valid `YYYY-MM-DD` strings |
+| `date_published` | Exactly null for drafts; owner-approved date required for published posts |
+| `featured_recipe` | An existing recipe slug, or null; published posts may feature only published recipes |
+
+Posts have freeform Markdown bodies with level-two sections; ingredients and
+directions are not required. Raw HTML, images, and wikilinks remain unsupported.
+Checklist prompts render as ordinary bullets, not recipe ingredient controls.
+The recipe remains the method's source of truth; use links rather than copied
+instructions. Blog claims must reflect the owner's account, not AI experience.
+
+Blog URLs are `<configured-base>/blog/<slug>/`, normally
+`/recipes/blog/<slug>/`. Within blog Markdown, use:
+
+```markdown
+[The recipe](../../korean-beef-lettuce-wraps/)
+[Recipe directions](../../korean-beef-lettuce-wraps/#directions)
+[Another post](../another-post/)
+[This section](#kitchen-notes)
+```
+
+Only link actual entries and headings. Validation checks all targets, including
+drafts. Draft-target body links become plain display text with no draft URL.
+The featured-recipe card uses the existing recipe's title, description, and
+timing, rather than separate blog copies. Recipe Markdown keeps its existing
+`../recipe-slug/` link contract.
+
+Published posts appear newest publication date first (slug breaks date ties),
+on the blog index and in the home page's latest-post section. They enter the
+Pagefind index and sitemap. `/recipes/search/` searches both recipes and posts;
+the home page's ingredient/time filters and recipe counts remain recipe-only.
+External source cards remain outside Pagefind. Draft posts are validated but
+excluded before Astro's content store, HTML, search, and sitemap generation.
+
+**Draft does not mean private.** Do not save private meal plans, schedules,
+family locations, medical details, journals, or rights-unclear material here.
+No actual cooking posts are supplied by the feature implementation.
+
+### Supporting agents
+
+Choose a repository agent in Copilot's agent picker:
+
+| Agent | Responsibility |
+| --- | --- |
+| Sous-Chef Chronicler | Turn owner-provided, public-safe cooking notes into original draft prose |
+| The Publisher's Editor | Review facts, provenance, privacy, links, and automated checks without publishing |
+| Meal-to-Post Planner | Propose meals conversationally; create only approved public-safe draft prompts |
+
+Example requests: "Draft a post about this recipe using these observations,"
+"Review this draft for publication readiness," or "Suggest three recipe-linked
+post topics; don't save my private schedule." Planner does not install timers
+or auto-publishing workflows. None of these agents commit, push, or deploy.
+
+For blog changes run the full verification commands above, plus:
+
+```powershell
+npm exec --no -- markdownlint "content/blog/*.md"
+```
+
+Run that separate lint command when blog Markdown files exist. Browser tests
+use synthetic published and draft posts only in their isolated fixture copy.
+The output verifier expects exactly published recipe/post routes and Pagefind
+entries; neither source files nor fixture output are deployment artifacts.

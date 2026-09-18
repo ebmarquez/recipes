@@ -41,6 +41,13 @@ Read `docs\authoring.md` before editing content and use Chef Mateo's
 
 ## Changes and Verification
 
+- Blog posts use `content\blog` and the strict schema in `src\lib\blog.ts`.
+  Start from `docs\blog-template.md`; drafts have a null publication date.
+  Only owner-approved, public-safe material belongs in drafts. The blog agents
+  must not save private meal plans or schedule automatic publication.
+  New blog posts require owner review before publication, just like recipes.
+  Blog posts enter site search, not recipe counts or ingredient/time filters.
+
 - Make surgical changes and preserve unrelated work.
 - Run content checks, type checks, Markdown linting, and the build before a
   completion claim. Run browser tests for UI or navigation changes.

@@ -45,6 +45,10 @@ section, h2, h3 { scroll-margin-top: 1.5rem; }
 .source-card h2 a:hover { text-decoration: underline; }
 .source-card .card-bottom { margin-top: auto; }
 .entry-date { font-size: .85rem; color: var(--muted); }
+.featured-recipes { display: block; }
+.search-result-title, .blog-card-title { font-size: 1.55rem; }
+.blog-card-title a { color: inherit; text-decoration: none; }
+.blog-card-title a:hover { text-decoration: underline; }
 .hero { text-align: center; padding-block: 5.5rem 4.5rem; }
 .eyebrow { font-size: .74rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; color: var(--herb); margin-bottom: 1rem; }
 .hero h1 { margin-bottom: 1rem; }

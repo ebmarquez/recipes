@@ -1,11 +1,14 @@
 import { entry } from './fixtures.ts';
 import type { Source } from '../src/lib/sources.ts';
+import type { BlogEntry } from '../src/lib/blog.ts';
 
 export const TEST_ORIGIN = 'http://127.0.0.1:4332';
 export const TEST_URL = `${TEST_ORIGIN}/recipes/`;
 export const HIDDEN_RECIPE = 'test-build-hidden-recipe';
 export const INGREDIENT_QUERY = 'Searchonlyparsley';
 export const EXTERNAL_QUERY = 'Qzxexternalreference';
+export const BLOG_QUERY = 'Qzxkitchennarrative';
+export const HIDDEN_BLOG = 'test-build-hidden-blog';
 
 const body = `## Ingredients
 
@@ -87,4 +90,36 @@ export const draftSentinels = [
   'DRAFTRECIPEINGREDIENTSENTINEL', 'DRAFTRECIPEBODYSENTINEL',
   'test-build-hidden-source', 'DRAFTSOURCETITLESENTINEL', 'DRAFTSOURCEDESCRIPTIONSENTINEL',
   'DRAFTSOURCECREATORSENTINEL', 'DRAFTSOURCECUISINESENTINEL',
+  HIDDEN_BLOG, 'DRAFTBLOGTITLESENTINEL', 'DRAFTBLOGDESCRIPTIONSENTINEL', 'DRAFTBLOGBODYSENTINEL',
+];
+
+export const blogFixtures: BlogEntry[] = [
+  {
+    filename: 'test-build-kitchen-note.md',
+    data: {
+      title: 'Synthetic kitchen note', slug: 'test-build-kitchen-note',
+      description: 'Synthetic dinner prose for browser tests, not an actual meal.',
+      publication_status: 'published', date_created: '2026-09-17', date_modified: '2026-09-17',
+      date_published: '2026-09-17', featured_recipe: 'test-build-thirty-minute-main',
+    },
+    body: `## Kitchen notes
+
+${BLOG_QUERY} ${INGREDIENT_QUERY}
+
+[Recipe directions](../../test-build-thirty-minute-main/#directions)
+[Earlier note](../test-build-earlier-note/)
+[Future post](../${HIDDEN_BLOG}/)
+[Future dish](../../${HIDDEN_RECIPE}/)
+`,
+  },
+  {
+    filename: 'test-build-earlier-note.md',
+    data: {
+      title: 'Synthetic earlier note', slug: 'test-build-earlier-note',
+      description: 'An older synthetic post without a featured recipe.',
+      publication_status: 'published', date_created: '2026-09-16', date_modified: '2026-09-16',
+      date_published: '2026-09-16', featured_recipe: null,
+    },
+    body: '## Kitchen notes\n\nTest-only text, not a real cooking experience.',
+  },
 ];

@@ -2,11 +2,20 @@ import { recipeSchema, type Recipe } from '../src/lib/recipe-contract.ts';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parseDocument } from 'yaml';
+import type { BlogPost } from '../src/lib/blog.ts';
 
 export async function copyRecipeTemplate(overrides: Partial<Recipe>) {
-  const template = await readFile(join(process.cwd(), '.github', 'skills', 'home-athlete-cooking', 'templates', 'recipe-template.md'), 'utf8');
+  return copyTemplate(join(process.cwd(), '.github', 'skills', 'home-athlete-cooking', 'templates', 'recipe-template.md'), overrides);
+}
+
+export async function copyBlogTemplate(overrides: Partial<BlogPost>) {
+  return copyTemplate(join(process.cwd(), 'docs', 'blog-template.md'), overrides);
+}
+
+async function copyTemplate(path: string, overrides: Record<string, unknown>) {
+  const template = await readFile(path, 'utf8');
   const match = template.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)([\s\S]*)$/);
-  if (!match) throw new Error('Recipe authoring template is missing YAML frontmatter');
+  if (!match) throw new Error(`${path}: authoring template is missing YAML frontmatter`);
   const document = parseDocument(match[1]);
   if (document.errors.length) throw new Error(document.errors.map(error => error.message).join('; '));
   for (const [key, value] of Object.entries(overrides)) document.set(key, value);

@@ -2,9 +2,12 @@
 import { getCollection } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import RecipeCard from '../components/RecipeCard.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { publishedPosts } from '../lib/blog.ts';
 import { recentRecipes } from '../lib/publication.ts';
 import { COLLECTION_NOTE } from '../lib/site.ts';
 const recipes = recentRecipes(await getCollection('recipes'));
+const posts = publishedPosts(await getCollection('blog')).slice(0, 3);
 const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
   [...new Set(recipes.flatMap(recipe => recipe.data[key]))].sort((a, b) => a.localeCompare(b));
 ---
@@ -42,6 +45,13 @@ const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
     <p id="no-results" class="notice" hidden>No recipes match. Try another ingredient or clear your filters.</p>
     {recipes.length === 0 && <p class="notice">The recipe box is waiting for its first approved recipe.</p>}
   </section>
+  {posts.length > 0 && <section class="browse wrapper" aria-labelledby="latest-blog-heading">
+    <div class="section-heading">
+      <h2 id="latest-blog-heading">Latest from the kitchen</h2>
+      <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/blog/`}>All blog posts</a>
+    </div>
+    <ul class="recipe-grid">{posts.map(({ data }) => <BlogCard post={data} />)}</ul>
+  </section>}
   <script>
     import '../scripts/browse.ts';
   </script>

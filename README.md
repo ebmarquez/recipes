@@ -72,9 +72,30 @@ when previewed locally.
 | `npm run verify:output` | Verify the clean deployment output against the current published collection |
 
 Search needs the generated Pagefind index: use **build + preview**, not `dev`.
-Search covers full hosted recipes only, not external source cards.
-Without JavaScript, all recipes, source links, ingredient checkboxes, jump links,
-and browser printing remain available.
+The home page searches full hosted recipes and keeps ingredient/time filters
+recipe-only. **Search** in the navigation searches both recipes and blog posts;
+external source cards stay outside Pagefind. Without JavaScript, all published
+recipes and posts, source links, ingredient checkboxes, jump links, and browser
+printing remain available.
+
+## Kitchen blog and authoring agents
+
+The **Blog** navigation opens `/recipes/blog/`. Published posts appear newest
+first, link to an optional featured recipe, and appear in the home page's latest
+posts section. The blog starts empty; no cooking experiences are fabricated.
+
+Start a public-safe draft in `content\blog` using
+[`docs\blog-template.md`](docs/blog-template.md). The strict metadata and link
+contract is documented in [Kitchen blog authoring](docs/authoring.md#kitchen-blog).
+Drafts use `date_published: null` and are excluded from generated output, but
+draft source files in this public repository are **not private**.
+
+Three repository agents support the workflow: **Meal-to-Post Planner** proposes
+topics and approved public-safe prompts, **Sous-Chef Chronicler** drafts prose
+from the owner's observations, and **The Publisher's Editor** reviews facts,
+links, privacy, and release checks. Select them in Copilot's agent picker.
+None publishes, commits, pushes, or schedules deployments. Personal meal plans
+and private schedules stay out of repository files.
 
 ## Validation and fixture isolation
 
@@ -96,11 +117,13 @@ npm run test:e2e
 
 The browser suite owns a loopback server on port **4332** and refuses to reuse
 another process. It copies current content into a fresh `.test-build-*` directory
-in this checkout and adds synthetic recipes and source cards there. It never
-edits `content\recipes` or `content\sources.json`. Synthetic cases cover unknown,
+in this checkout and adds synthetic recipes, blog posts, and source cards there.
+It never edits `content\recipes`, `content\blog`, or `content\sources.json`.
+Synthetic cases cover unknown,
 zero, exact-30, and over-30-minute timing, cuisine/category variety, numbered step
-headings, a template-derived draft, and unpublished source references.
-The tests derive real recipe/source counts from the collections, not a pilot list.
+headings, template-derived recipe/blog drafts, unpublished source references,
+blog chronology, featured recipes, and cross-content search.
+The tests derive real recipe/blog/source counts from the collections, not a pilot list.
 
 Only test builds receive the internal `COOKBOOK_TEST_CONTENT_DIR` override.
 Do not set it for authoring or release builds. Staged content is removed after
@@ -108,7 +131,7 @@ building; the suite scans all generated files, including compressed Pagefind
 data, for draft sentinels. Teardown rebuilds from real content and verifies that
 no fixtures remain. Release verification refuses test overrides and rejects
 unexpected HTML pages, fixture markers, missing publication dates, and incorrect
-canonicals, sitemap entries, source counts, or Pagefind recipe counts.
+canonicals, sitemap entries, listing counts, or Pagefind recipe/post counts.
 
 Do not edit content or run a second build while validation is running. If a test
 process is forcibly terminated, inspect its specific `.test-build-*` directory,
@@ -139,31 +162,37 @@ visibility, uses private-vault data, uploads the repository, or enables Pages
 through an API. Pages is already configured for GitHub Actions.
 
 The owner reviews, commits, pushes, merges, and confirms the successful Pages
-run. Recipe-authoring tools must not automatically push or publish.
-After deployment, verify the live home page, recipe search, source library,
-and sitemap at the site address above.
+run. Recipe and blog authoring tools must not automatically push or publish.
+After deployment, verify the live home page, blog, recipe and site search,
+source library, and sitemap at the site address above.
 
 ## Architecture and public URLs
 
 | Path | Responsibility |
 | --- | --- |
 | `content\recipes\*.md` | Approved recipe metadata and Markdown body |
+| `content\blog\*.md` | Public-safe kitchen posts; new entries remain drafts |
 | `content\sources.json` | External reference cards; no recipe instructions or nutrition |
 | `src\lib\recipe-contract.ts` | Shared runtime recipe schema and URL/text rules |
+| `src\lib\blog.ts` | Strict blog schema, featured-recipe validation, reading and ordering |
 | `src\lib\sources.ts` | Strict source schema, validation, and published-only listing |
 | `src\lib\publication.ts` | Central publication predicate, recipe selection, ordering, URLs, filters |
 | `src\lib\site.ts` | Public origin/base, canonical URLs, sitemap and robots serialization |
-| `src\content.config.ts` | Astro recipe loader; drafts never enter its content store |
+| `src\content.config.ts` | Astro recipe and blog loaders; drafts never enter their content stores |
 | `src\pages\[slug].astro` | Hosted recipe routes |
 | `src\pages\sources.astro` | Clearly labeled external source library |
+| `src\pages\blog` | Blog index and published post routes |
+| `src\pages\search.astro` | Site-wide recipe and blog search |
+| `.github\agents` | Cooking, blog drafting, editorial review, and topic planning agents |
 | `src\lib\verify-output.ts` | Final real-content artifact verification |
 
 Canonical recipe paths are `/recipes/<slug>/`, never
 `/recipes/recipes/<slug>/`. Recently added recipes use publication dates when
 present, then modified/created dates with a stable title tie-break.
-The sitemap contains only the home page, source-library page, and published
-recipe pages. Drafts, individual source-card targets, fixtures in release
-output, and 404 are excluded. No feed is generated.
+Blog paths are `/recipes/blog/<slug>/`, with newest publication dates first
+and slug tie-breaks. The sitemap contains the home, source library, blog index,
+site search, and published recipe/post pages. Drafts, individual source-card
+targets, fixtures in release output, and 404 are excluded. No feed is generated.
 
 `/recipes/robots.txt` points to `/recipes/sitemap.xml`. Crawlers discover
 robots policy at the origin root, so this project-scoped file does **not**

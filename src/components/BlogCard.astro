@@ -1,0 +1,14 @@
+---
+import type { BlogPost } from '../lib/blog.ts';
+import { blogHref } from '../lib/blog.ts';
+interface Props { post: BlogPost; heading?: 'h2' | 'h3' }
+const { post, heading: Heading = 'h3' } = Astro.props;
+---
+<li class="recipe-card" data-blog-card>
+  <article>
+    <p class="eyebrow">From the kitchen</p>
+    <Heading class="blog-card-title"><a href={blogHref(post.slug, import.meta.env.BASE_URL)}>{post.title}</a></Heading>
+    <p class="card-description">{post.description}</p>
+    {post.date_published && <p class="entry-date">Published <time datetime={post.date_published}>{post.date_published}</time></p>}
+  </article>
+</li>

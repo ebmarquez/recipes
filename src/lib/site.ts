@@ -1,5 +1,6 @@
 import type { Recipe } from './recipe-contract.ts';
 import { publishedRecipes, recipeHref } from './publication.ts';
+import { publishedPosts, blogHref, type BlogPost } from './blog.ts';
 
 export const SITE_ORIGIN = 'https://ebmarquez.github.io';
 export const SITE_BASE = '/recipes/';
@@ -18,13 +19,18 @@ export interface SitemapPage {
   lastmod?: string;
 }
 
-export function publicPages(recipes: { data: Recipe }[]): SitemapPage[] {
+export function publicPages(recipes: { data: Recipe }[], posts: { data: BlogPost }[] = []): SitemapPage[] {
   return [
     { url: canonicalUrl(SITE_BASE) },
     { url: canonicalUrl(`${SITE_BASE}sources/`) },
+    { url: canonicalUrl(`${SITE_BASE}blog/`) },
+    { url: canonicalUrl(`${SITE_BASE}search/`) },
     ...publishedRecipes(recipes).toSorted((a, b) => a.data.slug.localeCompare(b.data.slug)).map(({ data }) => ({
       url: canonicalUrl(recipeHref(data.slug, SITE_BASE)),
       lastmod: data.date_modified,
+    })),
+    ...publishedPosts(posts).map(({ data }) => ({
+      url: canonicalUrl(blogHref(data.slug, SITE_BASE)), lastmod: data.date_modified,
     })),
   ];
 }
