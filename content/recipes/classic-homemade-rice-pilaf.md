@@ -30,7 +30,7 @@ key_technique: >-
   covered
 dietary:
   - Vegetarian with vegetable broth and oil/vegan butter
-  - Vegan when using oil or vegan butter and vegetable broth
+  - Vegan when using oil or vegan butter, vegetable broth, and egg-free pasta
 special_notes: >-
   Independently written adaptation for a personal recipe collection; no physical testing
   claimed.
@@ -87,8 +87,8 @@ butter.
 
 ## Make-Ahead and Storage
 
-- **Refrigerate:** Cool leftovers completely and store in a shallow, airtight container in
-  the refrigerator for 3-4 days.
+- **Refrigerate:** Refrigerate leftovers promptly in a shallow, airtight container within
+  2 hours (or 1 hour if the temperature is above 90°F), and use within 3-4 days.
 - **Freeze:** Place cooled rice pilaf in freezer-safe bags or containers and freeze for up
   to 2 months; thaw in the refrigerator overnight before reheating.
 - **Reheat:** Reheat thoroughly in the microwave with a splash of water, or in a covered
