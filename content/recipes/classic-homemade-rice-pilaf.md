@@ -1,7 +1,7 @@
 ---
 title: "Classic Homemade Rice Pilaf"
 slug: classic-homemade-rice-pilaf
-description: "A perfect homemade alternative to boxed mixes, featuring toasted vermicelli and long-grain white rice simmered in a seasoned, savory broth."
+description: "A perfect homemade alternative to boxed mixes, featuring toasted orzo or vermicelli and long-grain white rice simmered in a seasoned, savory broth."
 type: Recipe
 publication_status: draft
 cuisine: American
@@ -19,11 +19,11 @@ difficulty: Easy
 meal_type: Side Dish
 main_ingredients:
   - Long-Grain White Rice
-  - Vermicelli Pasta
+  - Vermicelli or Orzo Pasta
   - Chicken Broth
   - Butter
   - Onion
-key_technique: Toast the broken vermicelli pasta and white rice in butter before simmering covered
+key_technique: Toast the orzo or broken vermicelli pasta and white rice in butter before simmering covered
 dietary:
   - Vegetarian with vegetable broth and oil/vegan butter
   - Vegan when using oil or vegan butter and vegetable broth
@@ -37,12 +37,12 @@ total_minutes: 30
 servings: 4
 ---
 
-Skip the store-bought box and make your own savory, fluffy rice pilaf using pantry staples like broken vermicelli pasta and long-grain white rice toasted in rich butter.
+Skip the store-bought box and make your own savory, fluffy rice pilaf using pantry staples like orzo, thin spaghetti, or vermicelli pasta and long-grain white rice toasted in rich butter.
 
 ## Ingredients
 
 - 2 tbsp unsalted butter, or olive oil for a vegan option
-- 1/3 cup thin spaghetti or vermicelli pasta, broken into 1/2-inch pieces
+- 1/3 cup thin spaghetti, vermicelli, or orzo pasta (if using spaghetti or vermicelli, broken into 1/2-inch pieces)
 - 1 cup long-grain white rice, rinsed in cool water and thoroughly drained
 - 1/4 cup finely diced yellow onion
 - 1 garlic clove, minced
@@ -53,14 +53,14 @@ Skip the store-bought box and make your own savory, fluffy rice pilaf using pant
 
 ## Instructions
 
-1. **Toast the pasta.** Melt the butter or olive oil in a medium saucepan with a tight-fitting lid over medium heat. Add the broken vermicelli pieces and cook, stirring frequently, for 2-3 minutes until they turn a deep golden brown.
+1. **Toast the pasta.** Melt the butter or olive oil in a medium saucepan with a tight-fitting lid over medium heat. Add the orzo or broken vermicelli/spaghetti pieces and cook, stirring frequently, for 2-3 minutes until they turn a deep golden brown.
 2. **Sauté the aromatics and rice.** Stir in the rinsed and drained long-grain white rice, diced onion, and minced garlic. Cook, stirring constantly, for 2-3 minutes until the onion softens slightly and the rice grains become translucent at the edges and smell toasted.
 3. **Simmer covered.** Pour in the chicken or vegetable broth, kosher salt, black pepper, and dried thyme. Bring the liquid to a boil, then give it a single quick stir to combine. Cover tightly with the lid and reduce the heat to low. Simmer for 15-17 minutes without removing the lid to keep the steam trapped.
 4. **Rest and fluff.** Remove the saucepan from the heat. Let it rest, covered, for 5 minutes. Remove the lid and fluff the pilaf gently with a fork to separate the grains and pasta.
 
 ## Notes
 
-- **Substitution:** Orzo pasta can be used instead of broken vermicelli or thin spaghetti if you don't have vermicelli on hand.
+- **Substitution:** You can use other small pasta shapes like ditalini or even broken ramen noodles if you don't have vermicelli or orzo.
 - **Budget:** Using a bouillon cube or powder mixed with warm water is an economical alternative to carton broth.
 - **Food safety:** Ensure all equipment is clean. Serve hot, and cool leftovers quickly.
 
