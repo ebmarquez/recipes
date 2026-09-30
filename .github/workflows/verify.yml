@@ -30,7 +30,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Audit dependencies
-        run: npm audit --audit-level=high
+        # Release artifacts do not ship development-only tooling such as markdownlint.
+        run: npm audit --omit=dev --audit-level=high
       - name: Validate recipes and source references
         run: npm run test:content
       - name: Check Astro and TypeScript
