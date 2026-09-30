@@ -72,6 +72,15 @@ test('homepage links to the blog without post previews on desktop, mobile, and w
   }
 });
 
+test('recipe search matches recipe metadata instead of incidental body mentions', async ({ page }) => {
+  await page.goto('./');
+  await page.getByLabel('Search recipes & ingredients').fill('soup');
+  const visibleCards = page.locator('#recipe-list [data-recipe-card]:visible');
+  await expect(page.getByRole('status')).toHaveText('7 recipes');
+  const categories = await visibleCards.locator('.eyebrow').allTextContents();
+  expect(categories.every(category => category.toLocaleLowerCase().includes('soup'))).toBe(true);
+});
+
 test('blog navigation, chronology, and recipe references use only published posts', async ({ page, request }) => {
   await page.goto('./');
   await expect(page.getByRole('link', { name: 'Local drafts', exact: true })).toHaveCount(0);
@@ -145,25 +154,15 @@ test('site search failures show an explicit fallback and blog reading works with
   }
 });
 
-test('real Pagefind ingredient search excludes source-library references', async ({ page }) => {
-  const failures: string[] = [];
-  page.on('pageerror', error => failures.push(error.message));
+test('recipe metadata search finds ingredients without searching source references', async ({ page }) => {
   await page.goto('./');
   await expect(page).toHaveTitle('The Everyday Table');
   await expect(page.locator(cards)).toHaveCount(recipes.length);
-  const indexed = page.waitForResponse(response => response.url().includes(`${SITE_BASE}pagefind/`) && response.ok());
-  await page.getByLabel('Search recipes & ingredients').fill(INGREDIENT_QUERY);
-  await indexed;
+  await page.getByLabel('Search recipes & ingredients').fill('Shabu-Shabu Beef');
   await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toHaveAttribute('data-url', `${SITE_BASE}test-build-thirty-minute-main/`);
+  await expect(page.locator(cards)).toHaveAttribute('data-url', `${SITE_BASE}quick-beef-bok-choy-miso-noodle-soup/`);
   await page.getByLabel('Search recipes & ingredients').fill(EXTERNAL_QUERY);
   await expect(page.getByRole('status')).toHaveText('0 recipes');
-  expect(await page.evaluate(async ({ query, base }) => {
-    const moduleUrl = `${location.origin}${base}pagefind/pagefind.js`;
-    const index = await import(moduleUrl);
-    return (await index.search(query)).results.length;
-  }, { query: EXTERNAL_QUERY, base: SITE_BASE })).toBe(0);
-  expect(failures).toEqual([]);
 });
 
 test('known-time filters exclude null/over-threshold values and combine with other filters', async ({ page }) => {
@@ -207,22 +206,14 @@ test('category and cuisine options reflect the entire published collection', asy
   }
 });
 
-test('search/filter state survives reload and unavailable search is explicit', async ({ page }) => {
-  await page.goto(`./?q=${INGREDIENT_QUERY}&time=30`);
+test('search and filter state survives reload', async ({ page }) => {
+  await page.goto('./?q=Synthetic+thirty-minute+main&time=30');
   await expect(page.getByRole('status')).toHaveText('1 recipe');
-  await expect(page.getByRole('alert')).toBeHidden();
   await page.getByLabel('Category', { exact: true }).selectOption('Fixture Main');
   await expect(page).toHaveURL(/category=Fixture\+Main/);
   await page.reload();
-  await expect(page.getByLabel('Search recipes & ingredients')).toHaveValue(INGREDIENT_QUERY);
+  await expect(page.getByLabel('Search recipes & ingredients')).toHaveValue('Synthetic thirty-minute main');
   await expect(page.getByLabel('Category', { exact: true })).toHaveValue('Fixture Main');
-  await expect(page.locator(cards)).toHaveCount(1);
-  await page.route('**/pagefind/**', route => route.abort());
-  await page.goto('./');
-  await page.getByLabel('Search recipes & ingredients').fill(INGREDIENT_QUERY);
-  await expect(page.getByRole('alert')).toContainText('Search is unavailable');
-  await expect(page.getByRole('status')).toContainText('search unavailable');
-  await page.getByLabel('Category', { exact: true }).selectOption('Fixture Soup');
   await expect(page.locator(cards)).toHaveCount(1);
 });
 

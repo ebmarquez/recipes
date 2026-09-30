@@ -29,7 +29,7 @@ const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
       <div class="search-field">
         <label for="recipe-search">Search recipes &amp; ingredients</label>
         <input id="recipe-search" name="q" type="search" placeholder="Try cilantro, corn, or a recipe name" autocomplete="off" aria-describedby="search-help" />
-        <p id="search-help" class="field-help">Search the full recipe, including its ingredients.</p>
+        <p id="search-help" class="field-help">Search recipe names, categories, cuisines, ingredients, and tags.</p>
       </div>
       <div class="filter-grid">
         <div><label for="cuisine">Cuisine</label><select id="cuisine" name="cuisine"><option value="">All cuisines</option>{choices('cuisine').map(value => <option>{value}</option>)}</select></div>
@@ -41,7 +41,6 @@ const choices = (key: 'cuisine' | 'category' | 'main_ingredients') =>
     </form>
     <p id="browse-help" class="notice">All recipes are listed below. Search and filters need JavaScript; reading, ingredient checkboxes, and printing do not.</p>
     <p id="results-status" role="status" aria-live="polite">{recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'}</p>
-    <p id="search-error" class="notice" role="alert" hidden></p>
     <ul class="recipe-grid" id="recipe-list">{recipes.map(({ data }) => <RecipeCard recipe={data} />)}</ul>
     <p id="no-results" class="notice" hidden>No recipes match. Try another ingredient or clear your filters.</p>
     {recipes.length === 0 && <p class="notice">The recipe box is waiting for its first approved recipe.</p>}

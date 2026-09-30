@@ -1,5 +1,4 @@
 import { matchesFilters } from '../lib/publication.ts';
-import { searchPaths } from '../lib/search.ts';
 
 const form = document.querySelector<HTMLFormElement>('#recipe-filters')!;
 const search = document.querySelector<HTMLInputElement>('#recipe-search')!;
@@ -8,17 +7,25 @@ const category = document.querySelector<HTMLSelectElement>('#category')!;
 const ingredient = document.querySelector<HTMLSelectElement>('#ingredient')!;
 const time = document.querySelector<HTMLSelectElement>('#time')!;
 const status = document.querySelector<HTMLElement>('#results-status')!;
-const errorMessage = document.querySelector<HTMLElement>('#search-error')!;
 const noResults = document.querySelector<HTMLElement>('#no-results')!;
 const cards = [...document.querySelectorAll<HTMLElement>('[data-recipe-card]')].map(element => ({
   element,
   data: JSON.parse(element.dataset.filter!) as Parameters<typeof matchesFilters>[0],
-  url: element.dataset.url!,
+  searchText: normalizeSearchText(element.dataset.searchText!),
 }));
 let revision = 0;
 let timer: ReturnType<typeof setTimeout>;
 
-async function update() {
+function normalizeSearchText(value: string): string {
+  return value.toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function matchesSearch(searchText: string, query: string): boolean {
+  const terms = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+  return terms.every(term => searchText.split(' ').includes(term));
+}
+
+function update() {
   const current = ++revision;
   const query = search.value.trim();
   const params = new URLSearchParams();
@@ -26,30 +33,17 @@ async function update() {
     if (control.value.trim()) params.set(control.name, control.value.trim());
   }
   history.replaceState(null, '', `${location.pathname}${params.size ? `?${params}` : ''}${location.hash}`);
-  errorMessage.hidden = true;
-  let matched: Set<string> | undefined;
-  if (query) {
-    status.textContent = 'Searching recipes…';
-    try {
-      matched = await searchPaths(query);
-    } catch (error) {
-      if (current !== revision) return;
-      console.error('Recipe search failed', error);
-      errorMessage.textContent = 'Search is unavailable. Browse using the filters below, or try again. For local search, run npm run build then npm run preview.';
-      errorMessage.hidden = false;
-    }
-  }
   if (current !== revision) return;
   let count = 0;
   for (const card of cards) {
-    const visible = (!matched || matched.has(card.url)) && matchesFilters(card.data, {
+    const visible = (!query || matchesSearch(card.searchText, query)) && matchesFilters(card.data, {
       cuisine: cuisine.value, category: category.value, ingredient: ingredient.value,
       maxMinutes: time.value ? Number(time.value) : undefined,
     });
     card.element.hidden = !visible;
     if (visible) count++;
   }
-  status.textContent = `${count} ${count === 1 ? 'recipe' : 'recipes'}${!errorMessage.hidden ? ' shown (search unavailable)' : ''}`;
+  status.textContent = `${count} ${count === 1 ? 'recipe' : 'recipes'}`;
   noResults.hidden = count !== 0;
 }
 

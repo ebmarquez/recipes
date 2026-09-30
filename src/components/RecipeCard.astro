@@ -9,7 +9,13 @@ const { recipe } = Astro.props;
   cuisine: recipe.cuisine,
   main_ingredients: recipe.main_ingredients,
   total_minutes: recipe.total_minutes,
-})} data-url={recipeHref(recipe.slug, import.meta.env.BASE_URL)}>
+})} data-search-text={JSON.stringify([
+  recipe.title,
+  recipe.category,
+  recipe.cuisine,
+  ...recipe.main_ingredients,
+  ...recipe.tags,
+].join(' '))} data-url={recipeHref(recipe.slug, import.meta.env.BASE_URL)}>
   <article>
     <p class="eyebrow">{recipe.category} <span aria-hidden="true">&middot;</span> {recipe.cuisine}</p>
     <h3><a href={recipeHref(recipe.slug, import.meta.env.BASE_URL)}>{recipe.title}</a></h3>
