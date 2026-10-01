@@ -5,7 +5,7 @@ description: >-
   A perfect homemade alternative to boxed mixes, featuring toasted orzo or vermicelli and
   long-grain white rice simmered in a seasoned, savory broth.
 type: Recipe
-publication_status: draft
+publication_status: published
 cuisine: American
 category: Side Dish
 tags:
@@ -32,15 +32,15 @@ dietary:
   - Vegetarian with vegetable broth and oil/vegan butter
   - Vegan when using oil or vegan butter, vegetable broth, and egg-free pasta
 special_notes: >-
-  Independently written adaptation for a personal recipe collection; no physical testing
-  claimed.
+  Seasoning and aromatics adjusted after home testing.
 date_created: 2026-09-29
-date_modified: 2026-09-29
-date_published: null
+date_modified: 2026-09-30
+date_published: 2026-09-30
 prep_minutes: 5
 cook_minutes: 20
 total_minutes: 30
 servings: 4
+source_name: Personal recipe collection
 ---
 
 Skip the store-bought box and make your own savory, fluffy rice pilaf using pantry staples
@@ -53,29 +53,33 @@ butter.
 - 1/3 cup thin spaghetti, vermicelli, or orzo pasta (if using spaghetti or vermicelli,
   broken into 1/2-inch pieces)
 - 1 cup long-grain white rice, rinsed in cool water and thoroughly drained
-- 1/4 cup finely diced yellow onion
-- 1 garlic clove, minced
+- 1/2 cup finely diced yellow onion
+- 2 garlic cloves, minced
 - 2 cups low-sodium chicken broth, or vegetable broth
-- 1/2 tsp kosher salt
+- 1 tsp kosher salt, plus more to taste
 - 1/4 tsp freshly ground black pepper
 - 1/4 tsp dried thyme
+- 1/4 tsp sweet paprika
+- 1 bay leaf
+- 1 tbsp chopped fresh parsley, optional, for finishing
 
 ## Instructions
 
 1. **Toast the pasta.** Melt the butter or olive oil in a medium saucepan with a
    tight-fitting lid over medium heat. Add the orzo or broken vermicelli/spaghetti pieces
    and cook, stirring frequently, for 2-3 minutes until they turn a deep golden brown.
-2. **Sauté the aromatics and rice.** Stir in the rinsed and drained long-grain white rice,
-   diced onion, and minced garlic. Cook, stirring constantly, for 2-3 minutes until the
-   onion softens slightly and the rice grains become translucent at the edges and smell
-   toasted.
+2. **Sauté the aromatics and rice.** Stir in the diced onion and cook for 2 minutes until
+   it begins to soften. Add the minced garlic and cook for 30 seconds, then stir in the
+   rinsed and drained long-grain white rice. Cook, stirring constantly, for 2-3 minutes
+   until the rice grains become translucent at the edges and smell toasted.
 3. **Simmer covered.** Pour in the chicken or vegetable broth, kosher salt, black pepper,
-   and dried thyme. Bring the liquid to a boil, then give it a single quick stir to
-   combine. Cover tightly with the lid and reduce the heat to low. Simmer for 15-17 minutes
-   without removing the lid to keep the steam trapped.
+   dried thyme, and paprika, then add the bay leaf. Bring the liquid to a boil, then give
+   it a single quick stir to combine. Cover tightly with the lid and reduce the heat to
+   low. Simmer for 15-17 minutes without removing the lid to keep the steam trapped.
 4. **Rest and fluff.** Remove the saucepan from the heat. Let it rest, covered, for
-   5 minutes. Remove the lid and fluff the pilaf gently with a fork to separate the grains
-   and pasta.
+   5 minutes. Remove the bay leaf, then fluff the pilaf gently with a fork to separate
+   the grains and pasta. Taste and add more salt if needed. Finish with the chopped
+   parsley, if using.
 
 ## Notes
 

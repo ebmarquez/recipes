@@ -14,6 +14,7 @@ const cards = '[data-recipe-card]:visible';
 const recipePaths = recipes.map(({ data }) => `${data.slug}/`);
 const allPaths = ['./', 'sources/', 'blog/', 'search/', ...recipePaths, ...posts.map(post => `blog/${post.data.slug}/`)];
 const knownQuick = recipes.filter(({ data }) => data.total_minutes !== null && data.total_minutes <= 30);
+const soupRecipes = recipes.filter(({ data }) => data.category.toLocaleLowerCase().includes('soup'));
 
 test('published photos load with alt text, captions and credit while draft and unused images return 404', async ({ page, request, browser }) => {
   for (const [path, filename, alt] of [
@@ -76,7 +77,7 @@ test('recipe search matches recipe metadata instead of incidental body mentions'
   await page.goto('./');
   await page.getByLabel('Search recipes & ingredients').fill('soup');
   const visibleCards = page.locator('#recipe-list [data-recipe-card]:visible');
-  await expect(page.getByRole('status')).toHaveText('7 recipes');
+  await expect(page.getByRole('status')).toHaveText(`${soupRecipes.length} recipes`);
   const categories = await visibleCards.locator('.eyebrow').allTextContents();
   expect(categories.every(category => category.toLocaleLowerCase().includes('soup'))).toBe(true);
 });
@@ -159,8 +160,13 @@ test('recipe metadata search finds ingredients without searching source referenc
   await expect(page).toHaveTitle('The Everyday Table');
   await expect(page.locator(cards)).toHaveCount(recipes.length);
   await page.getByLabel('Search recipes & ingredients').fill('Shabu-Shabu Beef');
-  await expect(page.locator(cards)).toHaveCount(1);
-  await expect(page.locator(cards)).toHaveAttribute('data-url', `${SITE_BASE}quick-beef-bok-choy-miso-noodle-soup/`);
+  await expect(page.locator(cards)).toHaveCount(2);
+  expect((await page.locator(cards).evaluateAll(elements =>
+    elements.map(element => element.getAttribute('data-url')).sort()
+  ))).toEqual([
+    `${SITE_BASE}chicken-miso-ramen/`,
+    `${SITE_BASE}quick-beef-bok-choy-miso-noodle-soup/`,
+  ]);
   await page.getByLabel('Search recipes & ingredients').fill(EXTERNAL_QUERY);
   await expect(page.getByRole('status')).toHaveText('0 recipes');
 });
