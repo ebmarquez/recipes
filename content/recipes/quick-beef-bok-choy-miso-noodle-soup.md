@@ -31,7 +31,7 @@ dietary:
   - Contains Wheat if using wheat-based noodles or soy sauce
 special_notes: Quick, carb-forward soup for a family dinner before a hard workout; use cooked rice instead of noodles when preferred
 date_created: 2026-09-30
-date_modified: 2026-09-30
+date_modified: 2026-10-01
 date_published: 2026-09-30
 prep_minutes: 5
 cook_minutes: 15
@@ -42,6 +42,10 @@ publication_status: published
 source_name: Personal recipe collection
 description:
   A fast Japanese-inspired soup with tender shabu-shabu beef, bok choy, noodles, and a savory miso broth.
+photos:
+  - src: quick-beef-bok-choy-miso-noodle-soup.webp
+    alt: A bowl of beef noodle soup with bok choy and a fried egg on a granite countertop.
+    credit: Photo by the site owner.
 ---
 
 Warm, savory, and ready in about 20 minutes. Thin shabu-shabu beef cooks quickly in the
