@@ -29,9 +29,10 @@ dietary:
   - Contains Soy
   - Contains Sesame if using sesame oil
   - Contains Wheat if using wheat-based noodles or soy sauce
+  - Contains Egg if using the fried egg topping
 special_notes: Quick, carb-forward soup for a family dinner before a hard workout; use cooked rice instead of noodles when preferred
 date_created: 2026-09-30
-date_modified: 2026-09-30
+date_modified: 2026-10-01
 date_published: 2026-09-30
 prep_minutes: 5
 cook_minutes: 15
@@ -42,6 +43,10 @@ publication_status: published
 source_name: Personal recipe collection
 description:
   A fast Japanese-inspired soup with tender shabu-shabu beef, bok choy, noodles, and a savory miso broth.
+photos:
+  - src: quick-beef-bok-choy-miso-noodle-soup.webp
+    alt: A bowl of beef noodle soup with bok choy and a fried egg on a granite countertop.
+    credit: Photo by the site owner.
 ---
 
 Warm, savory, and ready in about 20 minutes. Thin shabu-shabu beef cooks quickly in the
@@ -63,6 +68,7 @@ light for an easier meal.
 - 1-2 tbsp soy sauce, to taste
 - 1 tsp toasted sesame oil
 - Cooked rice, optional, instead of noodles
+- Fried eggs, optional, for serving
 - Chili crisp or sliced green onions, optional, for serving
 
 ## Instructions
@@ -96,8 +102,8 @@ only if needed.
 
 ### Step 6: Finish and serve
 
-Stir in the sesame oil, then ladle the soup over the noodles or rice. Top with green
-onions or chili crisp if desired.
+Stir in the sesame oil, then ladle the soup over the noodles or rice. Top with a fried
+egg, green onions, or chili crisp if desired.
 
 ## Athlete-Friendly Timing
 
@@ -125,8 +131,9 @@ use within 3-4 days. Reheat the soup to a simmer and add fresh noodles or rice i
 ## Dietary Notes
 
 Miso and soy sauce contain soy. Many Japanese noodles and standard soy sauces contain
-wheat, so check labels or use verified gluten-free alternatives. Sesame oil contains sesame.
-Check ingredient labels and cross-contact information for allergies.
+wheat, so check labels or use verified gluten-free alternatives. Sesame oil contains sesame,
+and the optional fried egg contains egg. Check ingredient labels and cross-contact information
+for allergies.
 
 ## Safe Handling
 
